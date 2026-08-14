@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<title>Seen · Want widget · In theaters indicator</title>
+<style>
+  :root {
+    --bg: #000;
+    --card: #0c0c0c;
+    --line: rgba(255,255,255,0.08);
+    --muted: #6e6e6e;
+    --text: #f2f2f2;
+    --purple: #8b5cf6;
+    --red: #ff3b30;
+    --red-soft: #ff453a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    padding: 18px 14px 80px;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1 { font-size: 22px; font-weight: 800; margin: 0 0 6px; text-align: right; }
+  .sub {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.55;
+    margin: 0 0 16px;
+    text-align: right;
+  }
+  .nav {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 4px 0 14px;
+    position: sticky;
+    top: 0;
+    background: linear-gradient(#000 70%, transparent);
+    z-index: 5;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nav a {
+    flex: 0 0 auto;
+    text-decoration: none;
+    color: #ddd;
+    background: #161616;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 7px 12px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .nav a.rec {
+    border-color: rgba(139,92,246,.55);
+    color: #c4b5fd;
+    background: rgba(139,92,246,.12);
+  }
+  .section {
+    margin-bottom: 26px;
+    scroll-margin-top: 56px;
+  }
+  .section-title {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-weight: 800;
+    margin: 0 0 6px;
+    text-transform: uppercase;
+    text-align: left;
+    direction: ltr;
+  }
+  .note {
+    font-size: 12px;
+    color: #9a9a9a;
+    margin: 0 0 10px;
+    text-align: right;
+    line-height: 1.45;
+  }
+  .note b { color: #ddd; }
+
+  /* Medium widget shell */
+  .widget {
+    width: min(100%, 340px);
+    margin-inline: auto;
+    background: #000;
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    padding: 12px 12px 14px;
+    box-shadow: 0 10px 40px rgba(0,0,0,.45);
+  }
+  .wh {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    direction: ltr;
+  }
+  .pill {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: #fff;
+    background: #222;
+    border-radius: 999px;
+    padding: 4px 8px;
+  }
+  .wh-title {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 800;
+    color: #fff;
+  }
+  .play {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--red);
+    position: relative;
+  }
+  .play::after {
+    content: "";
+    position: absolute;
+    left: 6px; top: 4px;
+    border-style: solid;
+    border-width: 5px 0 5px 7px;
+    border-color: transparent transparent transparent #fff;
+  }
+  .posters {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    direction: ltr;
+  }
+  .poster {
+    aspect-ratio: 2/3;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(160deg, #333, #151515);
+    border: 1px solid rgba(255,255,255,.06);
+  }
+  .p1 { background: linear-gradient(160deg, #5a4638, #1a120e 70%), #2a1c14; }
+  .p2 { background: linear-gradient(160deg, #c4a35a, #3a2e12); }
+  .p3 { background: linear-gradient(160deg, #c0392b, #1a0a08); }
+  .p4 { background: linear-gradient(160deg, #f1c40f, #111); }
+  .p5 { background: linear-gradient(160deg, #f4d03f, #222); }
+  .poster .label {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: 4px;
+    font-size: 7px;
+    font-weight: 700;
+    color: rgba(255,255,255,.55);
+    background: linear-gradient(transparent, rgba(0,0,0,.7));
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ===== Indicators ===== */
+  @keyframes blinkSoft {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: .35; transform: scale(.92); }
+  }
+  @keyframes pulseRing {
+    0% { box-shadow: 0 0 0 0 rgba(255,59,48,.55); opacity: 1; }
+    70% { box-shadow: 0 0 0 7px rgba(255,59,48,0); opacity: .85; }
+    100% { box-shadow: 0 0 0 0 rgba(255,59,48,0); opacity: 1; }
+  }
+  @keyframes livePulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .45; }
+  }
+
+  /* A — current (weak) */
+  .ind-a {
+    position: absolute; top: 5px; left: 5px;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--red-soft);
+    box-shadow: 0 0 6px rgba(255,59,48,.45);
+    animation: blinkSoft 1.8s ease-in-out infinite;
+  }
+  .ind-a::before {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: rgba(0,0,0,.55);
+    z-index: -1;
+  }
+
+  /* B — bigger dot + dark disc */
+  .ind-b {
+    position: absolute; top: 4px; left: 4px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: rgba(0,0,0,.72);
+    display: grid; place-items: center;
+  }
+  .ind-b i {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--red);
+    box-shadow: 0 0 8px rgba(255,59,48,.85);
+    animation: blinkSoft 1.6s ease-in-out infinite;
+  }
+
+  /* C — pulsing ring */
+  .ind-c {
+    position: absolute; top: 5px; left: 5px;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--red);
+    animation: pulseRing 1.4s ease-out infinite;
+  }
+
+  /* D — NOW pill top */
+  .ind-d {
+    position: absolute; top: 4px; left: 4px; right: 4px;
+    height: 14px;
+    border-radius: 5px;
+    background: linear-gradient(90deg, #ff2d55, #ff3b30);
+    color: #fff;
+    font-size: 7px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(255,45,85,.4);
+  }
+
+  /* E — ticket corner */
+  .ind-e {
+    position: absolute; top: 0; left: 0;
+    width: 0; height: 0;
+    border-style: solid;
+    border-width: 22px 22px 0 0;
+    border-color: var(--red) transparent transparent transparent;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,.4));
+  }
+  .ind-e span {
+    position: absolute;
+    top: -20px; left: 2px;
+    font-size: 8px;
+    color: #fff;
+    font-weight: 900;
+    transform: rotate(-45deg);
+    line-height: 1;
+  }
+
+  /* F — bottom bar IN THEATERS */
+  .ind-f {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    padding: 4px 2px 5px;
+    background: linear-gradient(transparent, rgba(0,0,0,.15) 20%, rgba(180,20,20,.92));
+    color: #fff;
+    font-size: 6.5px;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    text-align: center;
+    text-shadow: 0 1px 2px rgba(0,0,0,.5);
+  }
+
+  /* G — cinema badge with icon */
+  .ind-g {
+    position: absolute; top: 4px; left: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: rgba(0,0,0,.78);
+    border: 1px solid rgba(255,59,48,.65);
+    border-radius: 999px;
+    padding: 2px 5px 2px 4px;
+    color: #fff;
+    font-size: 7px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+  }
+  .ind-g .live {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--red);
+    animation: livePulse 1.1s ease-in-out infinite;
+  }
+
+  /* H — red border glow */
+  .poster.has-h {
+    box-shadow: inset 0 0 0 2px rgba(255,59,48,.95), 0 0 10px rgba(255,59,48,.35);
+  }
+  .ind-h {
+    position: absolute; top: 4px; left: 4px;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--red);
+    animation: blinkSoft 1.5s ease-in-out infinite;
+  }
+
+  /* I — play / ticket chip bottom-left */
+  .ind-i {
+    position: absolute; bottom: 4px; left: 4px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--red);
+    display: grid; place-items: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,.5);
+  }
+  .ind-i::after {
+    content: "";
+    border-style: solid;
+    border-width: 3.5px 0 3.5px 5.5px;
+    border-color: transparent transparent transparent #fff;
+    margin-left: 1px;
+  }
+
+  /* J — dual: big live + NOW strip */
+  .ind-j-dot {
+    position: absolute; top: 4px; left: 4px;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: rgba(0,0,0,.75);
+    border: 1.5px solid rgba(255,59,48,.8);
+    display: grid; place-items: center;
+  }
+  .ind-j-dot i {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--red);
+    animation: pulseRing 1.3s ease-out infinite;
+  }
+  .ind-j-bar {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    height: 12px;
+    background: #e50914;
+    color: #fff;
+    font-size: 7px;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .grid2 {
+    display: grid;
+    gap: 18px;
+  }
+  @media (min-width: 720px) {
+    .grid2 { grid-template-columns: 1fr 1fr; }
+  }
+  .pick {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    direction: rtl;
+  }
+  .tag {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 10px;
+    border-radius: 8px;
+    background: #161616;
+    border: 1px solid var(--line);
+    color: #bbb;
+  }
+  .tag.good { border-color: rgba(46,204,113,.45); color: #7dcea0; }
+  .tag.warn { border-color: rgba(245,197,24,.4); color: #f5c518; }
+  .tag.bad { border-color: rgba(255,59,48,.35); color: #ff8a80; }
+  .legend {
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: #0c0c0c;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    font-size: 12px;
+    color: #aaa;
+    line-height: 1.55;
+    text-align: right;
+  }
+  .legend strong { color: #fff; }
+</style>
+</head>
+<body>
+  <h1>علامة «في السينما» على Want to Watch</h1>
+  <p class="sub">
+    النقطة الحمراء الحالية صغيرة وسهلة تضيع على البوستر.
+    تحت: نفس الويدجت بعدة أشكال — الفيلم الأول فقط «في السينما».
+  </p>
+
+  <div class="nav">
+    <a href="#a">A حالي</a>
+    <a href="#b">B أكبر</a>
+    <a href="#c">C نبض</a>
+    <a href="#d" class="rec">D NOW</a>
+    <a href="#e">E زاوية</a>
+    <a href="#f" class="rec">F شريط</a>
+    <a href="#g" class="rec">G Live</a>
+    <a href="#h">H إطار</a>
+    <a href="#i">I Play</a>
+    <a href="#j">J مزدوج</a>
+  </div>
+
+  <div class="grid2">
+
+    <section class="section" id="a">
+      <div class="section-title">A · Current soft blink</div>
+      <p class="note">الوضع الحالي — نقطة صغيرة، غالباً <b>مو واضحة</b> على البوسترات المزدحمة.</p>
+      <div class="widget">
+        <div class="wh"><span class="pill">MOVIES</span><div class="wh-title">Want to Watch</div><div class="play"></div></div>
+        <div class="posters">
+          <div class="poster p1"><span class="ind-a"></span><div class="label">Rivals</div></div>
+          <div class="poster p2"><div class="label">Backrooms</div></div>
+          <div class="poster p3"><div class="label">Michael</div></div>
+          <div class="poster p4"><div class="label">High&Low</div></div>
+          <div class="poster p5"><div class="label">Exit 8</div></div>
+        </div>
+      </div>
+      <div class="pick"><span class="tag bad">ضعيف</span><span class="tag">صغير</span></div>
+    </section>
+
+    <section class="section" id="b">
+      <div class="section-title">B · Bigger dot on dark disc</div>
+      <p class="note">نفس الفكرة لكن <b>أكبر + دائرة سوداء</b> عشان ما تضيع على البوستر.</p>
+      <div class="widget">
+        <div class="wh"><span class="pill">MOVIES</span><div class="wh-title">Want to Watch</div><div class="play"></div></div>
+        <div class="posters">
+          <div class="poster p1"><span class="ind-b"><i></i></span><div class="label">Rivals</div></div>
+          <div class="poster p2"><div class="label">Backrooms</div></div>
+          <div class="poster p3"><div class="label">Michael</div></div>
+          <div class="poster p4"><div class="label">High&Low</div></div>
+          <div class="poster p5"><div class="label">Exit 8</div></div>
+        </div>
+      </div>
+      <div class="pick"><span class="tag good">أوضح</span><span class="tag">Minimal</span></div>
+    </section>
+
+    <section class="section" id="c">
+      <div class="section-title">C · Pulse ring</div>
+      <p class="note">نقطة مع <b>حلقة تنبض</b> — تحس إنها «live» بدون نص.</p>
+      <div class="widget">
+        <div class="wh"><span class="pill">MOVIES</span><div class="wh-title">Want to Watch</div><div class="play"></div></div>
+        <div class="posters">
+          <div class="poster p1"><span class="ind-c"></span><div class="label">Rivals</div></div>
+          <div class="poster p2"><div class="label">Backrooms</div></div>
+          <div class="poster p3"><div class="label">Michael</div></div>
+          <div class="poster p4"><div class="label">High&Low</div></div>
+          <div class="poster p5"><div class="label">Exit 8</div></div>
+        </div>
+      </div>
+      <div class="pick"><span class="tag good">حيّ</span><span class="tag warn">قد يزعج</span></div>
+    </section>
+
+    <section class="section" id="d">
+      <div class="section-title">D · NOW pill (recommended)</div>
+      <p class="note">شريط أحمر صغير فوق البوستر بكلمة <b>NOW</b> — واضح من أول نظرة.</p>
+      <div class="widget">
+        <div class="wh"><span class="pill">MOVIES</span><div class="wh-title">Want to Watch</div><div class="play"></div></div>
+        <div class="posters">
+          <div class="poster p1"><span class="ind-d">NOW</span><div class="label">Rivals</div></div>
+          <div class="poster p2"><div class="label">Backrooms</div></div>
+          <div class="poster p3"><div class="label">Michael</div></div>
+          <div class="poster p4"><div class="label">High&Low</div></div>
+          <div class="poster p5"><div class="label">Exit 8</div></div>
+        </div>
+      </div>
+      <div class="pick"><span class="tag good">موصى</span><span class="tag good">مقروء</span></div>
+    </section>
+
+    <section class="section" id="e">
+      <div class="section-title">E · Corner ribbon</div>
+      <p class="note">مثل شارة الزاوية — يشبه تطبيقات التذاكر.</p>
+      <div class="widget">
+        <div class="wh"><span class="pill">MOVIES</span><div class="wh-title">Want to Watch</div><div class="play"></div></div>
+        <div class="posters">
+          <div class="poster p1"><span class="ind-e"><span>●</span></span><div class="label">Rivals</div></div>
+          <div class="poster p2"><div class="label">Backrooms</div></div>
+          <div class="poster p3"><div class="label">Michael</div></div>
+          <div class="poster p4"><div class="label">High&Low</div></div>
+          <div class="poster p5"><div class="label">Exit 8</div></div>
+        </div>
+      </div>
+      <div class="pick"><span class="tag">مألوف</span><span class="tag warn">يغطي جزء من البوستر</span></div>
+    </section>
+
+    <section class="section" id="f">
+      <div class="section-title">F · Bottom “IN THEATERS”</div>
+      <p class="note">شريط سفلي بالنص الكامل — <b>الأوضح معنىً</b>، لكنه يشغل مساحة أكبر.</p>
+      <div class="widget">
+        <div class="wh"><span class="pill">MOVIES</span><div class="wh-title">Want to Watch</div><div class="play"></div></div>
+        <div class="posters">
+          <div class="poster p1"><span class="ind-f">IN THEATERS</span></div>
+          <div class="poster p2"><div class="label">Backrooms</div></div>
+          <div class="poster p3"><div class="label">Michael</div></div>
+          <div class="poster p4"><div class="label">High&Low</div></div>
+          <div class="poster p5"><div class="label">Exit 8</div></div>
+        </div>
+      </div>
+      <div class="pick"><span class="tag good">موصى</span><span class="tag">صريح</span></div>
+    </section>
+
+    <section class="section" id="g">
+      <div class="section-title">G · Live · Cinema chip</div>
+      <p class="note">حبة صغيرة: نقطة حية + <b>LIVE</b> أو يمكن تغييرها لـ NOW / CINEMA.</p>
+      <div class="widget">
+        <div class="wh"><span class="pill">MOVIES</span><div class="wh-title">Want to Watch</div><div class="play"></div></div>
+        <div class="posters">
+          <div class="poster p1"><span class="ind-g"><span class="live"></span>LIVE</span><div class="label">Rivals</div></div>
+          <div class="poster p2"><div class="label">Backrooms</div></div>
+          <div class="poster p3"><div class="label">Michael</div></div>
+          <div class="poster p4"><div class="label">High&Low</div></div>
+          <div class="poster p5"><div class="label">Exit 8</div></div>
+        </div>
+      </div>
+      <div class="pick"><span class="tag good">موصى</span><span class="tag good">توازن</span></div>
+    </section>
+
+    <section class="section" id="h">
+      <div class="section-title">H · Red frame + tiny dot</div>
+      <p class="note">إطار أحمر حول البوستر كامل — يميّزه حتى من بعيد بدون ما تقرأ نص.</p>
+      <div class="widget">
+        <div class="wh"><span class="pill">MOVIES</span><div class="wh-title">Want to Watch</div><div class="play"></div></div>
+        <div class="posters">
+          <div class="poster p1 has-h"><span class="ind-h"></span><div class="label">Rivals</div></div>
+          <div class="poster p2"><div class="label">Backrooms</div></div>
+          <div class="poster p3"><div class="label">Michael</div></div>
+          <div class="poster p4"><div class="label">High&Low</div></div>
+          <div class="poster p5"><div class="label">Exit 8</div></div>
+        </div>
+      </div>
+      <div class="pick"><span class="tag good">واضح من بعيد</span><span class="tag warn">صاخب شوي</span></div>
+    </section>
+
+    <section class="section" id="i">
+      <div class="section-title">I · Red play chip</div>
+      <p class="note">أيقونة play حمراء — تربط فكرة «اعرضه الآن / في السينما».</p>
+      <div class="widget">
+        <div class="wh"><span class="pill">MOVIES</span><div class="wh-title">Want to Watch</div><div class="play"></div></div>
+        <div class="posters">
+          <div class="poster p1"><span class="ind-i"></span><div class="label">Rivals</div></div>
+          <div class="poster p2"><div class="label">Backrooms</div></div>
+          <div class="poster p3"><div class="label">Michael</div></div>
+          <div class="poster p4"><div class="label">High&Low</div></div>
+          <div class="poster p5"><div class="label">Exit 8</div></div>
+        </div>
+      </div>
+      <div class="pick"><span class="tag">أنيق</span><span class="tag warn">المعنى أقل صراحة</span></div>
+    </section>
+
+    <section class="section" id="j">
+      <div class="section-title">J · Dot + bottom bar (max clarity)</div>
+      <p class="note">مزدوج: نقطة + شريط <b>NOW</b> — أقصى وضوح إذا عندك فيلم أو اثنين فقط في السينما.</p>
+      <div class="widget">
+        <div class="wh"><span class="pill">MOVIES</span><div class="wh-title">Want to Watch</div><div class="play"></div></div>
+        <div class="posters">
+          <div class="poster p1">
+            <span class="ind-j-dot"><i></i></span>
+            <span class="ind-j-bar">NOW</span>
+          </div>
+          <div class="poster p2"><div class="label">Backrooms</div></div>
+          <div class="poster p3"><div class="label">Michael</div></div>
+          <div class="poster p4"><div class="label">High&Low</div></div>
+          <div class="poster p5"><div class="label">Exit 8</div></div>
+        </div>
+      </div>
+      <div class="pick"><span class="tag good">واضح جداً</span><span class="tag warn">تقيل</span></div>
+    </section>
+
+  </div>
+
+  <div class="legend">
+    <strong>اقتراحي السريع:</strong><br>
+    • أفضل توازن: <strong>G (LIVE chip)</strong> أو <strong>D (NOW pill)</strong><br>
+    • أوضح معنى: <strong>F (IN THEATERS)</strong><br>
+    • إذا تبي تبقى نقطة فقط: <strong>B</strong> أو <strong>C</strong> أحسن من الحالي بكثير<br>
+    قل لي الحرف اللي يعجبك (مثلاً D أو G) وأطبّقه على الويدجت.
+  </div>
+</body>
+</html>
