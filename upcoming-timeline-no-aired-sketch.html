@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<title>Seen · Upcoming timeline (no AIRED button)</title>
+<style>
+  :root {
+    --bg: #000;
+    --line: rgba(255,255,255,0.10);
+    --muted: #6e6e6e;
+    --text: #f2f2f2;
+    --purple: #9b5cff;
+    --gold: #ffd700;
+    --blue: #73bfff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    padding: 16px 14px 80px; -webkit-font-smoothing: antialiased;
+  }
+  h1 { font-size: 21px; font-weight: 800; margin: 0 0 6px; text-align: right; }
+  .sub {
+    color: var(--muted); font-size: 13px; line-height: 1.55;
+    margin: 0 0 14px; text-align: right;
+  }
+  .nav {
+    display: flex; gap: 6px; overflow-x: auto; padding: 4px 0 14px;
+    position: sticky; top: 0; background: linear-gradient(#000 70%, transparent); z-index: 8;
+  }
+  .nav a {
+    flex: 0 0 auto; text-decoration: none; color: #ddd;
+    background: #161616; border: 1px solid var(--line);
+    border-radius: 999px; padding: 7px 12px; font-size: 12px; font-weight: 700;
+  }
+  .nav a.rec { border-color: rgba(155,92,255,.55); color: #c4b5fd; background: rgba(155,92,255,.12); }
+
+  .section { margin-bottom: 26px; scroll-margin-top: 52px; }
+  .section-title {
+    font-size: 11px; letter-spacing: .08em; color: var(--muted);
+    font-weight: 800; text-transform: uppercase; margin: 0 0 6px;
+    text-align: left; direction: ltr;
+  }
+  .note {
+    font-size: 12px; color: #9a9a9a; margin: 0 0 10px;
+    text-align: right; line-height: 1.45;
+  }
+  .note b { color: #ddd; }
+
+  .phone {
+    width: min(100%, 390px); margin-inline: auto;
+    background: #000; border: 1px solid var(--line);
+    border-radius: 28px; overflow: hidden; position: relative;
+    height: 620px; box-shadow: 0 18px 50px rgba(0,0,0,.5);
+    display: flex; flex-direction: column;
+  }
+  .tabs {
+    display: grid; grid-template-columns: 1fr 1fr; direction: ltr; padding-top: 10px;
+    flex-shrink: 0;
+  }
+  .tabs .t {
+    text-align: center; font-size: 13px; font-weight: 600;
+    color: #8a8a8a; padding: 8px 0 10px; border-bottom: 2px solid transparent;
+  }
+  .tabs .t.on { color: #fff; font-weight: 800; border-bottom-color: var(--purple); }
+
+  .scroll {
+    flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    direction: ltr; position: relative;
+  }
+  .hint {
+    text-align: center; font-size: 11px; color: #555;
+    padding: 8px 12px 4px; font-weight: 600;
+  }
+  .day {
+    display: flex; justify-content: center; margin: 10px 0 6px;
+  }
+  .day span {
+    font-size: 11px; font-weight: 800; color: #fff;
+    background: #262626; border-radius: 999px; padding: 6px 12px;
+  }
+  .day.today span {
+    background: rgba(155,92,255,.18); color: #e9ddff;
+    border: 1px solid rgba(155,92,255,.45);
+  }
+  .day.past span { color: #9a9a9a; background: #1c1c1c; }
+
+  .row {
+    display: grid; grid-template-columns: 52px 1fr auto;
+    gap: 10px; align-items: center;
+    padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+  .row.dim { opacity: .55; }
+  .poster {
+    width: 52px; height: 78px; border-radius: 8px;
+    background: linear-gradient(160deg, #3a3a3a, #151515);
+  }
+  .p1 { background: linear-gradient(160deg, #2a5a8a, #0d1a28); }
+  .p2 { background: linear-gradient(160deg, #5a2a6a, #1a0d20); }
+  .p3 { background: linear-gradient(160deg, #6a4a2a, #20150d); }
+  .p4 { background: linear-gradient(160deg, #2a6a4a, #0d2018); }
+  .p5 { background: linear-gradient(160deg, #6a2a2a, #200d0d); }
+  .meta .title { font-size: 14px; font-weight: 800; color: #fff; }
+  .badge {
+    display: inline-block; margin: 4px 0 2px;
+    font-size: 9px; font-weight: 900; letter-spacing: .04em;
+    padding: 3px 7px; border-radius: 5px;
+  }
+  .badge.new { background: rgba(255,215,0,.2); color: #ffd700; border: 1px solid rgba(255,215,0,.45); }
+  .badge.ret { background: rgba(115,191,255,.18); color: #73bfff; }
+  .badge.aired { background: rgba(255,255,255,.08); color: #aaa; }
+  .meta .ep { font-size: 18px; font-weight: 800; color: #fff; margin-top: 2px; }
+  .meta .ename { font-size: 12px; color: #8a8a8a; }
+  .days { font-size: 11px; font-weight: 800; color: #cfcfcf; letter-spacing: .04em; white-space: nowrap; }
+  .days.aired { color: #777; font-weight: 700; }
+
+  .botnav {
+    flex-shrink: 0; height: 58px; background: rgba(18,18,18,.96);
+    border-top: 1px solid rgba(255,255,255,.06);
+    display: grid; grid-template-columns: repeat(5,1fr);
+    align-items: center; direction: ltr;
+    font-size: 9px; color: #777; text-align: center;
+  }
+  .botnav .on { color: var(--purple); font-weight: 800; }
+
+  .float-wrap {
+    position: absolute; left: 0; right: 0; bottom: 70px;
+    display: flex; justify-content: center; z-index: 4; pointer-events: none;
+  }
+  .today-pill {
+    pointer-events: auto;
+    display: inline-flex; align-items: center; gap: 7px;
+    background: #242424; border: 1px solid #474747;
+    border-radius: 999px; padding: 11px 16px;
+    box-shadow: 0 10px 28px rgba(0,0,0,.55);
+    font-size: 13px; font-weight: 800; color: #fff;
+    cursor: pointer; user-select: none;
+  }
+  .today-pill .dot {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--purple);
+  }
+  .today-pill .chev { opacity: .55; font-size: 11px; }
+
+  .vs {
+    display: grid; gap: 18px;
+  }
+  @media (min-width: 820px) { .vs { grid-template-columns: 1fr 1fr; } }
+
+  .verdict {
+    margin-top: 8px; padding: 14px 16px; background: #0c0c0c;
+    border: 1px solid var(--line); border-radius: 16px;
+    font-size: 13px; color: #bbb; line-height: 1.6; text-align: right;
+  }
+  .verdict strong { color: #fff; }
+  .verdict .yes { color: #7dcea0; font-weight: 800; }
+  .verdict .no { color: #ff8a80; font-weight: 800; }
+  .tag {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    padding: 5px 10px; border-radius: 8px; margin: 4px 4px 0 0;
+    background: #161616; border: 1px solid var(--line); color: #bbb;
+  }
+  .tag.good { border-color: rgba(46,204,113,.45); color: #7dcea0; }
+  .tag.warn { border-color: rgba(245,197,24,.4); color: #f5c518; }
+</style>
+</head>
+<body>
+  <h1>Upcoming بدون زر AIRED؟</h1>
+  <p class="sub">
+    فكرتك: زي <b>This Month</b> — تدخل على الجاي، وإذا سكرولت لفوق تشوف اللي نزل (Aired)
+    بدون زر منفصل. تحت مقارنة + رأيي الصريح.
+  </p>
+
+  <div class="nav">
+    <a href="#now">الحالي</a>
+    <a href="#idea" class="rec">فكرتك</a>
+    <a href="#opinion" class="rec">رأيي</a>
+  </div>
+
+  <div class="vs">
+    <!-- CURRENT -->
+    <section class="section" id="now">
+      <div class="section-title">Now · زر AIRED منفصل</div>
+      <p class="note">الحالي: Upcoming فقط تحت. اللي نزل مخفي وراء زر <b>AIRED</b> يفتح شيت.</p>
+      <div class="phone">
+        <div class="tabs"><div class="t">Watch List</div><div class="t on">Upcoming</div></div>
+        <div class="scroll">
+          <div style="display:flex;justify-content:center;padding:12px 0 6px;direction:ltr">
+            <span style="font-size:11px;font-weight:800;color:#fff;background:#262626;border-radius:999px;padding:6px 12px">↺ AIRED</span>
+          </div>
+          <div class="day"><span>Monday</span></div>
+          <div class="row">
+            <div class="poster p1"></div>
+            <div class="meta">
+              <div class="title">Lanterns ›</div>
+              <span class="badge new">NEW SEASON</span>
+              <div class="ep">S01 E01</div>
+              <div class="ename">Pilot</div>
+            </div>
+            <div class="days">2 DAYS</div>
+          </div>
+          <div class="day"><span>Later</span></div>
+          <div class="row">
+            <div class="poster p2"></div>
+            <div class="meta">
+              <div class="title">Dark Matter ›</div>
+              <span class="badge ret">RETURNING</span>
+              <div class="ep">S02 E01</div>
+              <div class="ename">A Quiet Life</div>
+            </div>
+            <div class="days">13 DAYS</div>
+          </div>
+        </div>
+        <div class="float-wrap">
+          <div class="today-pill"><span class="dot"></span> Premieres <span class="chev">▾</span></div>
+        </div>
+        <div class="botnav"><div>Home</div><div class="on">Shows</div><div>Movies</div><div>Explore</div><div>Profile</div></div>
+      </div>
+      <div>
+        <span class="tag warn">زر إضافي</span>
+        <span class="tag warn">الـ aired مخفي</span>
+      </div>
+    </section>
+
+    <!-- IDEA -->
+    <section class="section" id="idea">
+      <div class="section-title">Idea · Timeline واحد (سكرول فوق = Aired)</div>
+      <p class="note">
+        افتح الصفحة ← تتمركز على <b>Today / الجاي</b>.
+        لفوق = اللي نزل. لتحت = القادم. زر Today يرجّعك. <b>جرّب السكرول</b>.
+      </p>
+      <div class="phone">
+        <div class="tabs"><div class="t">Watch List</div><div class="t on">Upcoming</div></div>
+        <div class="scroll" id="timeline">
+          <div class="hint">↑ scroll up for aired</div>
+
+          <div class="day past"><span>Wed · Aug 6</span></div>
+          <div class="row dim">
+            <div class="poster p5"></div>
+            <div class="meta">
+              <div class="title">The Westies ›</div>
+              <span class="badge aired">AIRED</span>
+              <div class="ep">S01 E06</div>
+              <div class="ename">Blood & Quiet</div>
+            </div>
+            <div class="days aired">Aug 6</div>
+          </div>
+
+          <div class="day past"><span>Sun · Aug 10</span></div>
+          <div class="row dim">
+            <div class="poster p4"></div>
+            <div class="meta">
+              <div class="title">Slow Horses ›</div>
+              <span class="badge aired">AIRED</span>
+              <div class="ep">S05 E06</div>
+              <div class="ename">Cleaning Up</div>
+            </div>
+            <div class="days aired">Aug 10</div>
+          </div>
+
+          <div class="day past"><span>Yesterday</span></div>
+          <div class="row dim">
+            <div class="poster p3"></div>
+            <div class="meta">
+              <div class="title">American Hostage ›</div>
+              <span class="badge aired">AIRED</span>
+              <div class="ep">S01 E03</div>
+              <div class="ename">Day Three</div>
+            </div>
+            <div class="days aired">Yesterday</div>
+          </div>
+
+          <!-- ANCHOR -->
+          <div class="day today" id="todayAnchor"><span>Today · Aug 15</span></div>
+          <div class="row">
+            <div class="poster p1"></div>
+            <div class="meta">
+              <div class="title">Lanterns ›</div>
+              <span class="badge new">NEW SEASON</span>
+              <div class="ep">S01 E01</div>
+              <div class="ename">Pilot</div>
+            </div>
+            <div class="days" style="color:var(--purple)">TODAY</div>
+          </div>
+
+          <div class="day"><span>Monday</span></div>
+          <div class="row">
+            <div class="poster p2"></div>
+            <div class="meta">
+              <div class="title">Dark Matter ›</div>
+              <span class="badge ret">RETURNING</span>
+              <div class="ep">S02 E01</div>
+              <div class="ename">A Quiet Life</div>
+            </div>
+            <div class="days">2 DAYS</div>
+          </div>
+
+          <div class="day"><span>Later</span></div>
+          <div class="row">
+            <div class="poster p3"></div>
+            <div class="meta">
+              <div class="title">Slow Horses ›</div>
+              <span class="badge ret">RETURNING</span>
+              <div class="ep">S06 E01</div>
+              <div class="ename">Strange Games</div>
+            </div>
+            <div class="days">32 DAYS</div>
+          </div>
+          <div style="height:40px"></div>
+        </div>
+
+        <div class="float-wrap">
+          <button class="today-pill" onclick="jumpToday()">
+            <span class="dot"></span> Today
+          </button>
+        </div>
+        <div class="botnav"><div>Home</div><div class="on">Shows</div><div>Movies</div><div>Explore</div><div>Profile</div></div>
+      </div>
+      <div>
+        <span class="tag good">زي This Month</span>
+        <span class="tag good">بدون زر زيادة</span>
+        <span class="tag">سكرول طبيعي</span>
+      </div>
+    </section>
+  </div>
+
+  <section class="section" id="opinion">
+    <div class="section-title">Honest take</div>
+    <div class="verdict">
+      <strong>رأيي الصريح:</strong><br><br>
+
+      <span class="yes">أتفق معك — الفكرة أحسن من زر AIRED.</span><br><br>
+
+      ليش؟<br>
+      1. زر AIRED <b>مخفي ذهنياً</b> — كثير ما ينضغط، واللي نزل يضيع.<br>
+      2. This Month أثبتت إن التايملاين الواحد (ماضي فوق / جاي تحت) مفهوم وسريع.<br>
+      3. Upcoming أصلاً عن <b>الوقت</b> — ففصل «نزل» في شيت ثاني يكسر التدفق.<br>
+      4. زر Today العائم يكفي للرجوع للجاي بدون زر ثالث.<br><br>
+
+      <strong>لكن انتبه لهذي التحديات:</strong><br>
+      • القائمة تصير أطول (aired + upcoming) — لازم نحدّ الـ aired (مثلاً آخر 7–14 يوم) عشان ما تصير مزبلة.<br>
+      • أول فتح لازم <b>يتمرّكز على Today/أول جاي</b> مو من أول السكرول (وإلا تشوف aired قبل ما تبي).<br>
+      • الصفوف الـ aired تكون أهدى شوي (dim) عشان ما تتلخبط مع الجاي.<br>
+      • فلتر Premieres / All episodes (اللي اخترت D) يشتغل على الاثنين، أو على الجاي بس — لازم نحدد.<br><br>
+
+      <strong>اقتراحي للتنفيذ لاحقاً:</strong><br>
+      • نشيل زر AIRED<br>
+      • تايملاين واحد: aired (محدود) فوق ← Today ← upcoming تحت<br>
+      • زر Today زي This Month<br>
+      • زر الوضع D (Premieres ▾) يضل عائم أو فوق — مو يتعارض مع Today<br><br>
+
+      <span class="yes">الخلاصة: فكرتك أقوى من التصميم الحالي. أنفذها قبل أو مع D.</span><br>
+      لو تمشي عليها، قل لي: نبدأ بالتايملاين بدون AIRED أولاً، ولا ندمجها مع زر D دفعة واحدة؟
+    </div>
+  </section>
+
+<script>
+  // Start centered on Today like This Month
+  function jumpToday() {
+    const el = document.getElementById('todayAnchor');
+    const sc = document.getElementById('timeline');
+    if (!el || !sc) return;
+    const top = el.offsetTop - 8;
+    sc.scrollTo({ top, behavior: 'smooth' });
+  }
+  window.addEventListener('load', () => {
+    const el = document.getElementById('todayAnchor');
+    const sc = document.getElementById('timeline');
+    if (el && sc) sc.scrollTop = el.offsetTop - 8;
+  });
+</script>
+</body>
+</html>
