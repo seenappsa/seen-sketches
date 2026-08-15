@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<title>Seen · Upcoming mode sketches</title>
+<style>
+  :root {
+    --bg: #000;
+    --card: #0c0c0c;
+    --line: rgba(255,255,255,0.10);
+    --muted: #6e6e6e;
+    --text: #f2f2f2;
+    --purple: #9b5cff; /* seenPrimary-ish */
+    --pill: #242424;
+    --pill-border: #474747;
+    --gold: #ffd700;
+    --blue: #73bfff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    padding: 16px 14px 90px;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1 { font-size: 21px; font-weight: 800; margin: 0 0 6px; text-align: right; }
+  .sub {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.55;
+    margin: 0 0 14px;
+    text-align: right;
+  }
+  .nav {
+    display: flex; gap: 6px; overflow-x: auto;
+    padding: 4px 0 14px; position: sticky; top: 0;
+    background: linear-gradient(#000 70%, transparent); z-index: 8;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nav a {
+    flex: 0 0 auto; text-decoration: none; color: #ddd;
+    background: #161616; border: 1px solid var(--line);
+    border-radius: 999px; padding: 7px 12px;
+    font-size: 12px; font-weight: 700;
+  }
+  .nav a.rec { border-color: rgba(155,92,255,.55); color: #c4b5fd; background: rgba(155,92,255,.12); }
+
+  .section { margin-bottom: 28px; scroll-margin-top: 52px; }
+  .section-title {
+    font-size: 11px; letter-spacing: .08em; color: var(--muted);
+    font-weight: 800; text-transform: uppercase; margin: 0 0 6px;
+    text-align: left; direction: ltr;
+  }
+  .note {
+    font-size: 12px; color: #9a9a9a; margin: 0 0 10px;
+    text-align: right; line-height: 1.45;
+  }
+  .note b { color: #ddd; }
+
+  /* Phone shell — Shows / Upcoming */
+  .phone {
+    width: min(100%, 390px);
+    margin-inline: auto;
+    background: #000;
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    overflow: hidden;
+    position: relative;
+    min-height: 560px;
+    box-shadow: 0 18px 50px rgba(0,0,0,.5);
+  }
+  .tabs {
+    display: grid; grid-template-columns: 1fr 1fr;
+    direction: ltr; padding-top: 10px;
+  }
+  .tabs .t {
+    text-align: center; font-size: 13px; font-weight: 600;
+    color: #8a8a8a; padding: 8px 0 10px; border-bottom: 2px solid transparent;
+  }
+  .tabs .t.on { color: #fff; font-weight: 800; border-bottom-color: var(--purple); }
+
+  .chip-row {
+    display: flex; justify-content: center; gap: 8px;
+    padding: 10px 12px 6px; direction: ltr; flex-wrap: wrap;
+  }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 800; color: #fff;
+    background: #262626; border-radius: 999px;
+    padding: 6px 12px; border: 1px solid transparent;
+  }
+  .chip .ic { color: #808080; font-size: 11px; }
+  .chip.active {
+    border-color: rgba(155,92,255,.55);
+    background: rgba(155,92,255,.14);
+    color: #e9ddff;
+  }
+  .chip .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--purple); flex-shrink: 0;
+  }
+
+  .list { padding: 4px 0 80px; direction: ltr; }
+  .day {
+    display: flex; justify-content: center; margin: 10px 0 6px;
+  }
+  .day span {
+    font-size: 11px; font-weight: 800; color: #fff;
+    background: #262626; border-radius: 999px; padding: 6px 12px;
+  }
+  .row {
+    display: grid; grid-template-columns: 52px 1fr auto;
+    gap: 10px; align-items: center;
+    padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+  .poster {
+    width: 52px; height: 78px; border-radius: 8px;
+    background: linear-gradient(160deg, #3a3a3a, #151515);
+  }
+  .p1 { background: linear-gradient(160deg, #2a5a8a, #0d1a28); }
+  .p2 { background: linear-gradient(160deg, #5a2a6a, #1a0d20); }
+  .p3 { background: linear-gradient(160deg, #6a4a2a, #20150d); }
+  .meta .title { font-size: 14px; font-weight: 800; color: #fff; }
+  .meta .badge {
+    display: inline-block; margin: 4px 0 2px;
+    font-size: 9px; font-weight: 900; letter-spacing: .04em;
+    padding: 3px 7px; border-radius: 5px;
+  }
+  .badge.new { background: rgba(255,215,0,.2); color: #ffd700; border: 1px solid rgba(255,215,0,.45); }
+  .badge.ret { background: rgba(115,191,255,.18); color: #73bfff; }
+  .meta .ep { font-size: 18px; font-weight: 800; color: #fff; margin-top: 2px; }
+  .meta .ename { font-size: 12px; color: #8a8a8a; }
+  .days { font-size: 11px; font-weight: 800; color: #cfcfcf; letter-spacing: .04em; white-space: nowrap; }
+
+  .botnav {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    height: 58px; background: rgba(18,18,18,.92);
+    border-top: 1px solid rgba(255,255,255,.06);
+    display: grid; grid-template-columns: repeat(5,1fr);
+    align-items: center; direction: ltr;
+    font-size: 9px; color: #777; text-align: center;
+  }
+  .botnav .on { color: var(--purple); font-weight: 800; }
+
+  /* Floating Today-style pill */
+  .float-wrap {
+    position: absolute; left: 0; right: 0; bottom: 72px;
+    display: flex; justify-content: center; pointer-events: none; z-index: 4;
+  }
+  .today-pill {
+    pointer-events: auto;
+    display: inline-flex; align-items: center; gap: 7px;
+    background: #242424; border: 1px solid #474747;
+    border-radius: 999px; padding: 11px 16px;
+    box-shadow: 0 10px 28px rgba(0,0,0,.55);
+    font-size: 13px; font-weight: 800; color: #fff;
+    cursor: pointer; user-select: none;
+  }
+  .today-pill .dot {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--purple);
+  }
+  .today-pill .chev { opacity: .55; font-size: 11px; margin-inline-start: 2px; }
+
+  /* Menu sheet */
+  .sheet-bg {
+    position: absolute; inset: 0; background: rgba(0,0,0,.55);
+    z-index: 6; display: none;
+  }
+  .sheet-bg.on { display: block; }
+  .sheet {
+    position: absolute; left: 10px; right: 10px; bottom: 70px;
+    background: #141414; border: 1px solid var(--line);
+    border-radius: 18px; padding: 10px; z-index: 7;
+    display: none; direction: ltr;
+    box-shadow: 0 16px 40px rgba(0,0,0,.55);
+  }
+  .sheet.on { display: block; }
+  .sheet .opt {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 12px; border-radius: 12px; cursor: pointer;
+  }
+  .sheet .opt:active, .sheet .opt.sel { background: rgba(155,92,255,.12); }
+  .sheet .opt .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--purple); margin-top: 5px; flex-shrink: 0;
+  }
+  .sheet .opt .dot.off { background: #444; }
+  .sheet .opt .lab { font-size: 14px; font-weight: 800; color: #fff; }
+  .sheet .opt .desc { font-size: 11px; color: #8a8a8a; margin-top: 3px; line-height: 1.35; }
+  .sheet .check { margin-inline-start: auto; color: var(--purple); font-weight: 900; }
+
+  .pick {
+    margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; direction: rtl;
+  }
+  .tag {
+    font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 8px;
+    background: #161616; border: 1px solid var(--line); color: #bbb;
+  }
+  .tag.good { border-color: rgba(46,204,113,.45); color: #7dcea0; }
+  .tag.warn { border-color: rgba(245,197,24,.4); color: #f5c518; }
+
+  .legend {
+    margin-top: 8px; padding: 12px 14px; background: #0c0c0c;
+    border: 1px solid var(--line); border-radius: 14px;
+    font-size: 12px; color: #aaa; line-height: 1.55; text-align: right;
+  }
+  .legend strong { color: #fff; }
+
+  .grid2 { display: grid; gap: 22px; }
+  @media (min-width: 780px) { .grid2 { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+  <h1>Upcoming · فلتر العرض</h1>
+  <p class="sub">
+    زر بنفس تصميم <b>Today</b> في This Month.
+    الضغط يفتح خيارين: العرض الحالي (Premieres) أو كل الحلقات القادمة (All).
+  </p>
+
+  <div class="nav">
+    <a href="#a" class="rec">A موصى</a>
+    <a href="#b">B أعلى القائمة</a>
+    <a href="#c">C شريحتين</a>
+    <a href="#d">D قائمة منسدلة</a>
+  </div>
+
+  <div class="grid2">
+
+    <!-- A -->
+    <section class="section" id="a">
+      <div class="section-title">A · Floating pill (like Today) + sheet</div>
+      <p class="note">زر عائم تحت بنفس شكل Today. الضغط يفتح قائمة خيارين. <b>موصى به</b>.</p>
+      <div class="phone" id="phoneA">
+        <div class="tabs"><div class="t">Watch List</div><div class="t on">Upcoming</div></div>
+        <div class="chip-row">
+          <span class="chip"><span class="ic">↺</span> AIRED</span>
+        </div>
+        <div class="list">
+          <div class="day"><span>Monday</span></div>
+          <div class="row">
+            <div class="poster p1"></div>
+            <div class="meta">
+              <div class="title">Lanterns ›</div>
+              <span class="badge new">NEW SEASON</span>
+              <div class="ep">S01 E01</div>
+              <div class="ename">Pilot</div>
+            </div>
+            <div class="days">2 DAYS</div>
+          </div>
+          <div class="day"><span>Later</span></div>
+          <div class="row">
+            <div class="poster p2"></div>
+            <div class="meta">
+              <div class="title">Dark Matter ›</div>
+              <span class="badge ret">RETURNING</span>
+              <div class="ep">S02 E01</div>
+              <div class="ename">A Quiet Life</div>
+            </div>
+            <div class="days">13 DAYS</div>
+          </div>
+          <div class="row">
+            <div class="poster p3"></div>
+            <div class="meta">
+              <div class="title">Slow Horses ›</div>
+              <span class="badge ret">RETURNING</span>
+              <div class="ep">S06 E01</div>
+              <div class="ename">Strange Games</div>
+            </div>
+            <div class="days">32 DAYS</div>
+          </div>
+        </div>
+
+        <div class="float-wrap">
+          <button class="today-pill" onclick="toggleSheet('A')">
+            <span class="dot"></span>
+            <span id="labelA">Premieres</span>
+            <span class="chev">▾</span>
+          </button>
+        </div>
+
+        <div class="sheet-bg" id="bgA" onclick="toggleSheet('A', false)"></div>
+        <div class="sheet" id="sheetA">
+          <div class="opt sel" onclick="pick('A','Premieres')">
+            <span class="dot"></span>
+            <div>
+              <div class="lab">Premieres</div>
+              <div class="desc">New series, new seasons, and mid-season returns (E01 / return after break)</div>
+            </div>
+            <span class="check">✓</span>
+          </div>
+          <div class="opt" onclick="pick('A','All episodes')">
+            <span class="dot off"></span>
+            <div>
+              <div class="lab">All episodes</div>
+              <div class="desc">Every upcoming episode from your library — weekly eps included</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="botnav">
+          <div>Home</div><div class="on">Shows</div><div>Movies</div><div>Explore</div><div>Profile</div>
+        </div>
+      </div>
+      <div class="pick"><span class="tag good">موصى</span><span class="tag">نفس Today</span><span class="tag">واضح</span></div>
+    </section>
+
+    <!-- B -->
+    <section class="section" id="b">
+      <div class="section-title">B · Top chip next to AIRED</div>
+      <p class="note">الزر فوق القائمة جنب AIRED — بنفس ستايل الكبسولة البنفسجية للنقطة.</p>
+      <div class="phone" id="phoneB">
+        <div class="tabs"><div class="t">Watch List</div><div class="t on">Upcoming</div></div>
+        <div class="chip-row">
+          <span class="chip"><span class="ic">↺</span> AIRED</span>
+          <button class="chip active" style="border:1px solid #474747;cursor:pointer" onclick="toggleSheet('B')">
+            <span class="dot"></span>
+            <span id="labelB">Premieres</span>
+            <span style="opacity:.55">▾</span>
+          </button>
+        </div>
+        <div class="list">
+          <div class="day"><span>Monday</span></div>
+          <div class="row">
+            <div class="poster p1"></div>
+            <div class="meta">
+              <div class="title">Lanterns ›</div>
+              <span class="badge new">NEW SEASON</span>
+              <div class="ep">S01 E01</div>
+              <div class="ename">Pilot</div>
+            </div>
+            <div class="days">2 DAYS</div>
+          </div>
+          <div class="day"><span>Later</span></div>
+          <div class="row">
+            <div class="poster p2"></div>
+            <div class="meta">
+              <div class="title">Dark Matter ›</div>
+              <span class="badge ret">RETURNING</span>
+              <div class="ep">S02 E01</div>
+              <div class="ename">A Quiet Life</div>
+            </div>
+            <div class="days">13 DAYS</div>
+          </div>
+        </div>
+
+        <div class="sheet-bg" id="bgB" onclick="toggleSheet('B', false)"></div>
+        <div class="sheet" id="sheetB" style="bottom:auto;top:118px">
+          <div class="opt sel" onclick="pick('B','Premieres')">
+            <span class="dot"></span>
+            <div>
+              <div class="lab">Premieres</div>
+              <div class="desc">New / returning seasons only</div>
+            </div>
+            <span class="check">✓</span>
+          </div>
+          <div class="opt" onclick="pick('B','All episodes')">
+            <span class="dot off"></span>
+            <div>
+              <div class="lab">All episodes</div>
+              <div class="desc">Full upcoming schedule</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="botnav">
+          <div>Home</div><div class="on">Shows</div><div>Movies</div><div>Explore</div><div>Profile</div>
+        </div>
+      </div>
+      <div class="pick"><span class="tag good">قريب من القائمة</span><span class="tag warn">يزاحم AIRED</span></div>
+    </section>
+
+    <!-- C -->
+    <section class="section" id="c">
+      <div class="section-title">C · Two Today-style pills (segment)</div>
+      <p class="note">زرّين جنب بعض بنفس تصميم Today — اختيار مباشر بدون قائمة.</p>
+      <div class="phone">
+        <div class="tabs"><div class="t">Watch List</div><div class="t on">Upcoming</div></div>
+        <div class="chip-row" style="gap:8px">
+          <span class="chip"><span class="ic">↺</span> AIRED</span>
+        </div>
+        <div class="chip-row" style="padding-top:2px;padding-bottom:10px">
+          <button class="today-pill" id="cPrem" style="padding:9px 14px;font-size:12px" onclick="setC(true)">
+            <span class="dot"></span> Premieres
+          </button>
+          <button class="today-pill" id="cAll" style="padding:9px 14px;font-size:12px;opacity:.45;border-color:#333" onclick="setC(false)">
+            <span class="dot" style="background:#555"></span> All episodes
+          </button>
+        </div>
+        <div class="list">
+          <div class="day"><span>Monday</span></div>
+          <div class="row">
+            <div class="poster p1"></div>
+            <div class="meta">
+              <div class="title">Lanterns ›</div>
+              <span class="badge new">NEW SEASON</span>
+              <div class="ep">S01 E01</div>
+              <div class="ename">Pilot</div>
+            </div>
+            <div class="days">2 DAYS</div>
+          </div>
+          <div class="row" id="cExtra" style="display:none">
+            <div class="poster p2"></div>
+            <div class="meta">
+              <div class="title">Lanterns ›</div>
+              <div class="ep">S01 E02</div>
+              <div class="ename">Chapter Two</div>
+            </div>
+            <div class="days">9 DAYS</div>
+          </div>
+        </div>
+        <div class="botnav">
+          <div>Home</div><div class="on">Shows</div><div>Movies</div><div>Explore</div><div>Profile</div>
+        </div>
+      </div>
+      <div class="pick"><span class="tag">سريع</span><span class="tag warn">يشغل مساحة فوق</span></div>
+    </section>
+
+    <!-- D -->
+    <section class="section" id="d">
+      <div class="section-title">D · Bottom pill always shows mode</div>
+      <p class="note">نفس A، لكن النص يتغيّر حسب الوضع المختار (Premieres ↔ All episodes).</p>
+      <div class="phone" id="phoneD">
+        <div class="tabs"><div class="t">Watch List</div><div class="t on">Upcoming</div></div>
+        <div class="chip-row">
+          <span class="chip"><span class="ic">↺</span> AIRED</span>
+        </div>
+        <div class="list">
+          <div class="day"><span>Later</span></div>
+          <div class="row">
+            <div class="poster p2"></div>
+            <div class="meta">
+              <div class="title">Dark Matter ›</div>
+              <span class="badge ret">RETURNING</span>
+              <div class="ep">S02 E01</div>
+              <div class="ename">A Quiet Life</div>
+            </div>
+            <div class="days">13 DAYS</div>
+          </div>
+        </div>
+        <div class="float-wrap">
+          <button class="today-pill" onclick="toggleSheet('D')">
+            <span class="dot"></span>
+            <span id="labelD">All episodes</span>
+            <span class="chev">▾</span>
+          </button>
+        </div>
+        <div class="sheet-bg" id="bgD" onclick="toggleSheet('D', false)"></div>
+        <div class="sheet" id="sheetD">
+          <div class="opt" onclick="pick('D','Premieres')">
+            <span class="dot off"></span>
+            <div>
+              <div class="lab">Premieres</div>
+              <div class="desc">New & returning seasons only</div>
+            </div>
+          </div>
+          <div class="opt sel" onclick="pick('D','All episodes')">
+            <span class="dot"></span>
+            <div>
+              <div class="lab">All episodes</div>
+              <div class="desc">Every upcoming episode</div>
+            </div>
+            <span class="check">✓</span>
+          </div>
+        </div>
+        <div class="botnav">
+          <div>Home</div><div class="on">Shows</div><div>Movies</div><div>Explore</div><div>Profile</div>
+        </div>
+      </div>
+      <div class="pick"><span class="tag good">واضح الوضع الحالي</span></div>
+    </section>
+
+  </div>
+
+  <div class="legend">
+    <strong>اقتراحي:</strong> <b>A</b> أو <b>D</b> — نفس زر Today العائم + قائمة خيارين.<br>
+    النصوص المقترحة:<br>
+    • <b>Premieres</b> = العرض الحالي (مسلسل جديد / موسم عائد / ميد سيزن)<br>
+    • <b>All episodes</b> = كل الحلقات القادمة<br><br>
+    قل لي الحرف (A / B / C / D) والنص اللي تبيه على الزر.
+  </div>
+
+<script>
+  function toggleSheet(id, force) {
+    const sheet = document.getElementById('sheet' + id);
+    const bg = document.getElementById('bg' + id);
+    const on = force === false ? false : !sheet.classList.contains('on');
+    sheet.classList.toggle('on', on);
+    bg.classList.toggle('on', on);
+  }
+  function pick(id, label) {
+    const el = document.getElementById('label' + id);
+    if (el) el.textContent = label;
+    const sheet = document.getElementById('sheet' + id);
+    sheet.querySelectorAll('.opt').forEach(o => {
+      const sel = o.querySelector('.lab')?.textContent === label;
+      o.classList.toggle('sel', sel);
+      const dot = o.querySelector('.dot');
+      if (dot) dot.classList.toggle('off', !sel);
+      const check = o.querySelector('.check');
+      if (check) check.style.display = sel ? '' : 'none';
+      if (sel && !check) {
+        const c = document.createElement('span');
+        c.className = 'check'; c.textContent = '✓';
+        o.appendChild(c);
+      }
+    });
+    toggleSheet(id, false);
+  }
+  function setC(prem) {
+    const a = document.getElementById('cPrem');
+    const b = document.getElementById('cAll');
+    const extra = document.getElementById('cExtra');
+    if (prem) {
+      a.style.opacity = '1'; a.style.borderColor = '#474747';
+      a.querySelector('.dot').style.background = 'var(--purple)';
+      b.style.opacity = '.45'; b.style.borderColor = '#333';
+      b.querySelector('.dot').style.background = '#555';
+      extra.style.display = 'none';
+    } else {
+      b.style.opacity = '1'; b.style.borderColor = '#474747';
+      b.querySelector('.dot').style.background = 'var(--purple)';
+      a.style.opacity = '.45'; a.style.borderColor = '#333';
+      a.querySelector('.dot').style.background = '#555';
+      extra.style.display = 'grid';
+    }
+  }
+</script>
+</body>
+</html>
