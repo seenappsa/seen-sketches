@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<title>Seen · Upcoming timeline (no AIRED button)</title>
+<title>Seen · Upcoming timeline (no AIRED)</title>
 <style>
   :root {
     --bg: #000;
@@ -14,6 +14,7 @@
     --purple: #9b5cff;
     --gold: #ffd700;
     --blue: #73bfff;
+    --link: #66b3ff;
   }
   * { box-sizing: border-box; }
   body {
@@ -53,7 +54,7 @@
     width: min(100%, 390px); margin-inline: auto;
     background: #000; border: 1px solid var(--line);
     border-radius: 28px; overflow: hidden; position: relative;
-    height: 620px; box-shadow: 0 18px 50px rgba(0,0,0,.5);
+    height: 680px; box-shadow: 0 18px 50px rgba(0,0,0,.5);
     display: flex; flex-direction: column;
   }
   .tabs {
@@ -89,10 +90,10 @@
 
   .row {
     display: grid; grid-template-columns: 52px 1fr auto;
-    gap: 10px; align-items: center;
+    gap: 10px; align-items: start;
     padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,.06);
   }
-  .row.dim { opacity: .55; }
+  .row.dim { opacity: .72; }
   .poster {
     width: 52px; height: 78px; border-radius: 8px;
     background: linear-gradient(160deg, #3a3a3a, #151515);
@@ -101,10 +102,15 @@
   .p2 { background: linear-gradient(160deg, #5a2a6a, #1a0d20); }
   .p3 { background: linear-gradient(160deg, #6a4a2a, #20150d); }
   .p4 { background: linear-gradient(160deg, #2a6a4a, #0d2018); }
-  .p5 { background: linear-gradient(160deg, #6a2a2a, #200d0d); }
-  .meta .title { font-size: 14px; font-weight: 800; color: #fff; }
+  .p5 { background: linear-gradient(160deg #8a2a1a, #2a0d08); }
+  .p6 { background: radial-gradient(circle at 40% 30%, #ff6a3a, #3a0a08 70%); }
+  .meta .title {
+    display: inline-block; font-size: 12px; font-weight: 800; color: #fff;
+    background: #1a1a1a; border: 1px solid rgba(255,255,255,.08);
+    border-radius: 999px; padding: 4px 10px; margin-bottom: 6px;
+  }
   .badge {
-    display: inline-block; margin: 4px 0 2px;
+    display: inline-block; margin: 0 0 4px;
     font-size: 9px; font-weight: 900; letter-spacing: .04em;
     padding: 3px 7px; border-radius: 5px;
   }
@@ -113,8 +119,24 @@
   .badge.aired { background: rgba(255,255,255,.08); color: #aaa; }
   .meta .ep { font-size: 18px; font-weight: 800; color: #fff; margin-top: 2px; }
   .meta .ename { font-size: 12px; color: #8a8a8a; }
-  .days { font-size: 11px; font-weight: 800; color: #cfcfcf; letter-spacing: .04em; white-space: nowrap; }
+  .meta .airedline { font-size: 11px; color: #777; margin-top: 4px; }
+  .stars { color: var(--gold); font-size: 12px; letter-spacing: 1px; margin-top: 4px; }
+  .check {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: #2ecc71; color: #fff; display: grid; place-items: center;
+    font-size: 14px; font-weight: 900; margin-top: 8px;
+  }
+  .days { font-size: 11px; font-weight: 800; color: #cfcfcf; letter-spacing: .04em; white-space: nowrap; margin-top: 8px; }
   .days.aired { color: #777; font-weight: 700; }
+
+  .more {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 10px 14px; color: var(--link); font-size: 12px; font-weight: 700;
+    border-bottom: 1px solid rgba(255,255,255,.06); cursor: pointer; user-select: none;
+  }
+  .more .ch { font-size: 11px; }
+  .more-extra { display: none; }
+  .more-extra.open { display: block; }
 
   .botnav {
     flex-shrink: 0; height: 58px; background: rgba(18,18,18,.96);
@@ -129,24 +151,67 @@
     position: absolute; left: 0; right: 0; bottom: 70px;
     display: flex; justify-content: center; z-index: 4; pointer-events: none;
   }
-  .today-pill {
+
+  /* Combined pill: Today (jump) + chevron (mode) */
+  .combo-pill {
     pointer-events: auto;
-    display: inline-flex; align-items: center; gap: 7px;
+    display: inline-flex; align-items: stretch;
     background: #242424; border: 1px solid #474747;
-    border-radius: 999px; padding: 11px 16px;
+    border-radius: 999px;
     box-shadow: 0 10px 28px rgba(0,0,0,.55);
-    font-size: 13px; font-weight: 800; color: #fff;
-    cursor: pointer; user-select: none;
+    overflow: hidden;
   }
-  .today-pill .dot {
+  .combo-pill .jump {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 11px 14px 11px 16px;
+    font-size: 13px; font-weight: 800; color: #fff;
+    cursor: pointer; user-select: none; border: 0; background: transparent;
+  }
+  .combo-pill .dot {
     width: 7px; height: 7px; border-radius: 50%; background: var(--purple);
   }
-  .today-pill .chev { opacity: .55; font-size: 11px; }
-
-  .vs {
-    display: grid; gap: 18px;
+  .combo-pill .mode {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 11px 14px 11px 10px;
+    border: 0; border-left: 1px solid #474747;
+    background: transparent; color: #ddd;
+    font-size: 12px; font-weight: 700; cursor: pointer; user-select: none;
   }
-  @media (min-width: 820px) { .vs { grid-template-columns: 1fr 1fr; } }
+  .combo-pill .mode .chev { opacity: .6; font-size: 10px; }
+  .combo-pill .jump:active, .combo-pill .mode:active { background: #2e2e2e; }
+
+  .sheet {
+    position: absolute; inset: 0; background: rgba(0,0,0,.55);
+    display: none; align-items: flex-end; z-index: 20; direction: ltr;
+  }
+  .sheet.open { display: flex; }
+  .sheet-card {
+    width: 100%; background: #1c1c1e; border-radius: 18px 18px 0 0;
+    padding: 10px 14px 28px; border-top: 1px solid rgba(255,255,255,.08);
+  }
+  .sheet-card .grab {
+    width: 36px; height: 4px; border-radius: 999px; background: #555;
+    margin: 4px auto 14px;
+  }
+  .opt {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 12px; border-radius: 12px; margin-bottom: 6px;
+    background: #2a2a2c; color: #fff; font-weight: 700; font-size: 15px;
+    cursor: pointer;
+  }
+  .opt.on { outline: 1px solid rgba(155,92,255,.55); background: #323036; }
+  .opt .subopt { display: block; font-size: 11px; color: #8a8a8a; font-weight: 600; margin-top: 3px; }
+  .opt .tick { color: var(--purple); font-weight: 900; }
+
+  .callout {
+    margin: 0 0 12px; padding: 10px 12px; border-radius: 12px;
+    background: #111; border: 1px solid var(--line);
+    font-size: 12px; color: #bbb; text-align: right; line-height: 1.5;
+  }
+  .callout code {
+    direction: ltr; display: inline-block; background: #1a1a1a;
+    padding: 2px 6px; border-radius: 6px; font-size: 11px; color: #c4b5fd;
+  }
 
   .verdict {
     margin-top: 8px; padding: 14px 16px; background: #0c0c0c;
@@ -155,214 +220,282 @@
   }
   .verdict strong { color: #fff; }
   .verdict .yes { color: #7dcea0; font-weight: 800; }
-  .verdict .no { color: #ff8a80; font-weight: 800; }
   .tag {
     display: inline-block; font-size: 11px; font-weight: 700;
     padding: 5px 10px; border-radius: 8px; margin: 4px 4px 0 0;
     background: #161616; border: 1px solid var(--line); color: #bbb;
   }
   .tag.good { border-color: rgba(46,204,113,.45); color: #7dcea0; }
-  .tag.warn { border-color: rgba(245,197,24,.4); color: #f5c518; }
 </style>
 </head>
 <body>
-  <h1>Upcoming بدون زر AIRED؟</h1>
+  <h1>Upcoming · تايملاين + زر مركّب</h1>
   <p class="sub">
-    فكرتك: زي <b>This Month</b> — تدخل على الجاي، وإذا سكرولت لفوق تشوف اللي نزل (Aired)
-    بدون زر منفصل. تحت مقارنة + رأيي الصريح.
+    بدون زر AIRED · سكرول فوق = اللي نزل · زر بالنص = Today · السهم = تغيير الوضع ·
+    حلقات نفس المسلسل بنفس اليوم تتجمّع زي History.
   </p>
 
-  <div class="nav">
-    <a href="#now">الحالي</a>
-    <a href="#idea" class="rec">فكرتك</a>
-    <a href="#opinion" class="rec">رأيي</a>
+  <div class="callout">
+    لو الرابط السابق ما فتح: جرّب الصفحة الرئيسية ثم اختَر السكيتش:<br>
+    <code>https://seenappsa.github.io/seen-sketches/</code><br>
+    أو مباشرة:<br>
+    <code>https://seenappsa.github.io/seen-sketches/upcoming-timeline-no-aired-sketch.html</code>
   </div>
 
-  <div class="vs">
-    <!-- CURRENT -->
-    <section class="section" id="now">
-      <div class="section-title">Now · زر AIRED منفصل</div>
-      <p class="note">الحالي: Upcoming فقط تحت. اللي نزل مخفي وراء زر <b>AIRED</b> يفتح شيت.</p>
-      <div class="phone">
-        <div class="tabs"><div class="t">Watch List</div><div class="t on">Upcoming</div></div>
-        <div class="scroll">
-          <div style="display:flex;justify-content:center;padding:12px 0 6px;direction:ltr">
-            <span style="font-size:11px;font-weight:800;color:#fff;background:#262626;border-radius:999px;padding:6px 12px">↺ AIRED</span>
+  <div class="nav">
+    <a href="#demo" class="rec">جرّب</a>
+    <a href="#pill">الزر</a>
+    <a href="#group">التجميع</a>
+    <a href="#opinion">رأيي</a>
+  </div>
+
+  <section class="section" id="demo">
+    <div class="section-title">Interactive demo</div>
+    <p class="note">
+      افتح ← تتمركز على <b>Today</b>. لفوق = aired. اضغط <b>Today</b> يرجع.
+      اضغط <b>▾</b> يفتح Premieres / All. اضغط <b>2 more episodes</b> يتوسع.
+    </p>
+
+    <div class="phone" id="phone">
+      <div class="tabs"><div class="t">Watch List</div><div class="t on">Upcoming</div></div>
+      <div class="scroll" id="timeline">
+        <div class="hint">↑ scroll up for aired</div>
+
+        <div class="day past"><span>Jul 27, 2026</span></div>
+
+        <!-- Grouped same show / same day (like screenshot) -->
+        <div class="row dim">
+          <div class="poster p6"></div>
+          <div class="meta">
+            <div class="title">FURIOUS ›</div>
+            <div class="ep">S01 | E01</div>
+            <div class="ename">The Gorgon</div>
+            <div class="airedline">Aired Jul 27, 2026</div>
+            <div class="stars">★★★★★</div>
           </div>
-          <div class="day"><span>Monday</span></div>
-          <div class="row">
-            <div class="poster p1"></div>
+          <div class="check">✓</div>
+        </div>
+        <div class="more" onclick="toggleMore(this)">
+          <span class="ch" data-ch>▼</span>
+          <span data-label>2 more episodes</span>
+        </div>
+        <div class="more-extra" id="furiousExtra">
+          <div class="row dim">
+            <div class="poster p6"></div>
             <div class="meta">
-              <div class="title">Lanterns ›</div>
-              <span class="badge new">NEW SEASON</span>
-              <div class="ep">S01 E01</div>
-              <div class="ename">Pilot</div>
+              <div class="title">FURIOUS ›</div>
+              <div class="ep">S01 | E02</div>
+              <div class="ename">Cold Start</div>
+              <div class="airedline">Aired Jul 27, 2026</div>
             </div>
-            <div class="days">2 DAYS</div>
+            <div class="check">✓</div>
           </div>
-          <div class="day"><span>Later</span></div>
+          <div class="row dim">
+            <div class="poster p6"></div>
+            <div class="meta">
+              <div class="title">FURIOUS ›</div>
+              <div class="ep">S01 | E03</div>
+              <div class="ename">Aftershock</div>
+              <div class="airedline">Aired Jul 27, 2026</div>
+            </div>
+            <div class="check">✓</div>
+          </div>
+        </div>
+
+        <div class="day past"><span>Yesterday</span></div>
+        <div class="row dim">
+          <div class="poster p3"></div>
+          <div class="meta">
+            <div class="title">American Hostage ›</div>
+            <span class="badge aired">AIRED</span>
+            <div class="ep">S01 E03</div>
+            <div class="ename">Day Three</div>
+          </div>
+          <div class="days aired">Yesterday</div>
+        </div>
+
+        <div class="day today" id="todayAnchor"><span>Today · Aug 15</span></div>
+        <div class="row">
+          <div class="poster p1"></div>
+          <div class="meta">
+            <div class="title">Lanterns ›</div>
+            <span class="badge new">NEW SEASON</span>
+            <div class="ep">S01 E01</div>
+            <div class="ename">Pilot</div>
+          </div>
+          <div class="days" style="color:var(--purple)">TODAY</div>
+        </div>
+
+        <!-- Upcoming dump day grouping -->
+        <div class="day"><span>Monday</span></div>
+        <div class="row">
+          <div class="poster p2"></div>
+          <div class="meta">
+            <div class="title">Dark Matter ›</div>
+            <span class="badge ret">RETURNING</span>
+            <div class="ep">S02 E01</div>
+            <div class="ename">A Quiet Life</div>
+          </div>
+          <div class="days">2 DAYS</div>
+        </div>
+        <div class="more" onclick="toggleMore(this)">
+          <span class="ch" data-ch>▼</span>
+          <span data-label>3 more episodes</span>
+        </div>
+        <div class="more-extra">
           <div class="row">
             <div class="poster p2"></div>
             <div class="meta">
               <div class="title">Dark Matter ›</div>
-              <span class="badge ret">RETURNING</span>
-              <div class="ep">S02 E01</div>
-              <div class="ename">A Quiet Life</div>
+              <div class="ep">S02 E02</div>
+              <div class="ename">The Box</div>
             </div>
-            <div class="days">13 DAYS</div>
+            <div class="days">2 DAYS</div>
           </div>
-        </div>
-        <div class="float-wrap">
-          <div class="today-pill"><span class="dot"></span> Premieres <span class="chev">▾</span></div>
-        </div>
-        <div class="botnav"><div>Home</div><div class="on">Shows</div><div>Movies</div><div>Explore</div><div>Profile</div></div>
-      </div>
-      <div>
-        <span class="tag warn">زر إضافي</span>
-        <span class="tag warn">الـ aired مخفي</span>
-      </div>
-    </section>
-
-    <!-- IDEA -->
-    <section class="section" id="idea">
-      <div class="section-title">Idea · Timeline واحد (سكرول فوق = Aired)</div>
-      <p class="note">
-        افتح الصفحة ← تتمركز على <b>Today / الجاي</b>.
-        لفوق = اللي نزل. لتحت = القادم. زر Today يرجّعك. <b>جرّب السكرول</b>.
-      </p>
-      <div class="phone">
-        <div class="tabs"><div class="t">Watch List</div><div class="t on">Upcoming</div></div>
-        <div class="scroll" id="timeline">
-          <div class="hint">↑ scroll up for aired</div>
-
-          <div class="day past"><span>Wed · Aug 6</span></div>
-          <div class="row dim">
-            <div class="poster p5"></div>
-            <div class="meta">
-              <div class="title">The Westies ›</div>
-              <span class="badge aired">AIRED</span>
-              <div class="ep">S01 E06</div>
-              <div class="ename">Blood & Quiet</div>
-            </div>
-            <div class="days aired">Aug 6</div>
-          </div>
-
-          <div class="day past"><span>Sun · Aug 10</span></div>
-          <div class="row dim">
-            <div class="poster p4"></div>
-            <div class="meta">
-              <div class="title">Slow Horses ›</div>
-              <span class="badge aired">AIRED</span>
-              <div class="ep">S05 E06</div>
-              <div class="ename">Cleaning Up</div>
-            </div>
-            <div class="days aired">Aug 10</div>
-          </div>
-
-          <div class="day past"><span>Yesterday</span></div>
-          <div class="row dim">
-            <div class="poster p3"></div>
-            <div class="meta">
-              <div class="title">American Hostage ›</div>
-              <span class="badge aired">AIRED</span>
-              <div class="ep">S01 E03</div>
-              <div class="ename">Day Three</div>
-            </div>
-            <div class="days aired">Yesterday</div>
-          </div>
-
-          <!-- ANCHOR -->
-          <div class="day today" id="todayAnchor"><span>Today · Aug 15</span></div>
-          <div class="row">
-            <div class="poster p1"></div>
-            <div class="meta">
-              <div class="title">Lanterns ›</div>
-              <span class="badge new">NEW SEASON</span>
-              <div class="ep">S01 E01</div>
-              <div class="ename">Pilot</div>
-            </div>
-            <div class="days" style="color:var(--purple)">TODAY</div>
-          </div>
-
-          <div class="day"><span>Monday</span></div>
           <div class="row">
             <div class="poster p2"></div>
             <div class="meta">
               <div class="title">Dark Matter ›</div>
-              <span class="badge ret">RETURNING</span>
-              <div class="ep">S02 E01</div>
-              <div class="ename">A Quiet Life</div>
+              <div class="ep">S02 E03</div>
+              <div class="ename">Superposition</div>
             </div>
             <div class="days">2 DAYS</div>
           </div>
-
-          <div class="day"><span>Later</span></div>
           <div class="row">
-            <div class="poster p3"></div>
+            <div class="poster p2"></div>
             <div class="meta">
-              <div class="title">Slow Horses ›</div>
-              <span class="badge ret">RETURNING</span>
-              <div class="ep">S06 E01</div>
-              <div class="ename">Strange Games</div>
+              <div class="title">Dark Matter ›</div>
+              <div class="ep">S02 E04</div>
+              <div class="ename">Entangled</div>
             </div>
-            <div class="days">32 DAYS</div>
+            <div class="days">2 DAYS</div>
           </div>
-          <div style="height:40px"></div>
         </div>
 
-        <div class="float-wrap">
-          <button class="today-pill" onclick="jumpToday()">
-            <span class="dot"></span> Today
+        <div class="day"><span>Later</span></div>
+        <div class="row">
+          <div class="poster p4"></div>
+          <div class="meta">
+            <div class="title">Slow Horses ›</div>
+            <span class="badge ret">RETURNING</span>
+            <div class="ep">S06 E01</div>
+            <div class="ename">Strange Games</div>
+          </div>
+          <div class="days">32 DAYS</div>
+        </div>
+        <div style="height:48px"></div>
+      </div>
+
+      <div class="float-wrap">
+        <div class="combo-pill" title="Today = jump · ▾ = mode">
+          <button class="jump" type="button" onclick="jumpToday()">
+            <span class="dot"></span>
+            <span>Today</span>
+          </button>
+          <button class="mode" type="button" onclick="openMode()">
+            <span id="modeLabel">Premieres</span>
+            <span class="chev">▾</span>
           </button>
         </div>
-        <div class="botnav"><div>Home</div><div class="on">Shows</div><div>Movies</div><div>Explore</div><div>Profile</div></div>
       </div>
-      <div>
-        <span class="tag good">زي This Month</span>
-        <span class="tag good">بدون زر زيادة</span>
-        <span class="tag">سكرول طبيعي</span>
+
+      <div class="sheet" id="modeSheet" onclick="if(event.target===this)closeMode()">
+        <div class="sheet-card">
+          <div class="grab"></div>
+          <div class="opt on" id="optPrem" onclick="pickMode('Premieres', this)">
+            <div>
+              Premieres
+              <span class="subopt">New series / returning season / mid-season return</span>
+            </div>
+            <span class="tick">✓</span>
+          </div>
+          <div class="opt" id="optAll" onclick="pickMode('All episodes', this)">
+            <div>
+              All episodes
+              <span class="subopt">Every upcoming episode from your library</span>
+            </div>
+            <span class="tick" style="visibility:hidden">✓</span>
+          </div>
+        </div>
       </div>
-    </section>
-  </div>
+
+      <div class="botnav"><div>Home</div><div class="on">Shows</div><div>Movies</div><div>Explore</div><div>Profile</div></div>
+    </div>
+
+    <div>
+      <span class="tag good">Today بالنص = قفز لليوم</span>
+      <span class="tag good">السهم = تغيير الوضع</span>
+      <span class="tag good">تجميع نفس اليوم</span>
+    </div>
+  </section>
+
+  <section class="section" id="pill">
+    <div class="section-title">Pill behavior</div>
+    <div class="verdict">
+      <strong>الزر العائم (مركّب):</strong><br>
+      • اضغط النص/النقطة <b>Today</b> → يوديك لتاريخ اليوم (أول الجاي).<br>
+      • اضغط السهم / اسم الوضع → شيت: <b>Premieres</b> أو <b>All episodes</b>.<br>
+      • ما نحتاج زرين طافيين — واحد يكفي زي اقتراحك.
+    </div>
+  </section>
+
+  <section class="section" id="group">
+    <div class="section-title">Same show · same day</div>
+    <div class="verdict">
+      زي السكرين (و زي History/AIRED الحالي): تظهر أول حلقة، وتحته
+      <b style="color:var(--link)">▼ N more episodes</b> — يفتح الباقي.
+      ينطبق على aired وعلى dump days في Upcoming (مثلاً Netflix ينزل كم حلقة بنفس اليوم).
+    </div>
+  </section>
 
   <section class="section" id="opinion">
     <div class="section-title">Honest take</div>
     <div class="verdict">
-      <strong>رأيي الصريح:</strong><br><br>
-
-      <span class="yes">أتفق معك — الفكرة أحسن من زر AIRED.</span><br><br>
-
-      ليش؟<br>
-      1. زر AIRED <b>مخفي ذهنياً</b> — كثير ما ينضغط، واللي نزل يضيع.<br>
-      2. This Month أثبتت إن التايملاين الواحد (ماضي فوق / جاي تحت) مفهوم وسريع.<br>
-      3. Upcoming أصلاً عن <b>الوقت</b> — ففصل «نزل» في شيت ثاني يكسر التدفق.<br>
-      4. زر Today العائم يكفي للرجوع للجاي بدون زر ثالث.<br><br>
-
-      <strong>لكن انتبه لهذي التحديات:</strong><br>
-      • القائمة تصير أطول (aired + upcoming) — لازم نحدّ الـ aired (مثلاً آخر 7–14 يوم) عشان ما تصير مزبلة.<br>
-      • أول فتح لازم <b>يتمرّكز على Today/أول جاي</b> مو من أول السكرول (وإلا تشوف aired قبل ما تبي).<br>
-      • الصفوف الـ aired تكون أهدى شوي (dim) عشان ما تتلخبط مع الجاي.<br>
-      • فلتر Premieres / All episodes (اللي اخترت D) يشتغل على الاثنين، أو على الجاي بس — لازم نحدد.<br><br>
-
-      <strong>اقتراحي للتنفيذ لاحقاً:</strong><br>
-      • نشيل زر AIRED<br>
-      • تايملاين واحد: aired (محدود) فوق ← Today ← upcoming تحت<br>
-      • زر Today زي This Month<br>
-      • زر الوضع D (Premieres ▾) يضل عائم أو فوق — مو يتعارض مع Today<br><br>
-
-      <span class="yes">الخلاصة: فكرتك أقوى من التصميم الحالي. أنفذها قبل أو مع D.</span><br>
-      لو تمشي عليها، قل لي: نبدأ بالتايملاين بدون AIRED أولاً، ولا ندمجها مع زر D دفعة واحدة؟
+      <span class="yes">الثلاثة مع بعض منطقية:</span><br>
+      1) تايملاين بدون AIRED<br>
+      2) زر Today بالنص + سهم للفلتر D<br>
+      3) تجميع حلقات نفس المسلسل/نفس اليوم<br><br>
+      التجميع أصلاً موجود في AIRED sheet و History — نعيد استخدامه في التايملاين الواحد.<br><br>
+      <strong>ملاحظة تنفيذ لاحقاً:</strong> في وضع Premieres غالباً ما تشوف dump كثير؛ التجميع يبان أكثر في <b>All episodes</b> + الـ aired.
     </div>
   </section>
 
 <script>
-  // Start centered on Today like This Month
   function jumpToday() {
     const el = document.getElementById('todayAnchor');
     const sc = document.getElementById('timeline');
     if (!el || !sc) return;
-    const top = el.offsetTop - 8;
-    sc.scrollTo({ top, behavior: 'smooth' });
+    sc.scrollTo({ top: el.offsetTop - 8, behavior: 'smooth' });
+  }
+  function openMode() {
+    document.getElementById('modeSheet').classList.add('open');
+  }
+  function closeMode() {
+    document.getElementById('modeSheet').classList.remove('open');
+  }
+  function pickMode(name, el) {
+    document.getElementById('modeLabel').textContent = name === 'All episodes' ? 'All' : 'Premieres';
+    document.querySelectorAll('.opt').forEach(o => {
+      o.classList.remove('on');
+      const t = o.querySelector('.tick');
+      if (t) t.style.visibility = 'hidden';
+    });
+    el.classList.add('on');
+    const tick = el.querySelector('.tick');
+    if (tick) tick.style.visibility = 'visible';
+    closeMode();
+  }
+  function toggleMore(btn) {
+    const extra = btn.nextElementSibling;
+    if (!extra || !extra.classList.contains('more-extra')) return;
+    const open = extra.classList.toggle('open');
+    const ch = btn.querySelector('[data-ch]');
+    const label = btn.querySelector('[data-label]');
+    if (ch) ch.textContent = open ? '▲' : '▼';
+    if (label) {
+      if (!label.dataset.orig) label.dataset.orig = label.textContent;
+      label.textContent = open ? 'Show less' : label.dataset.orig;
+    }
   }
   window.addEventListener('load', () => {
     const el = document.getElementById('todayAnchor');
