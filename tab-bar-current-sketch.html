@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Seen · Tab bar — التصميم الحالي (build 32f09594)</title>
+<style>
+  :root {
+    --primary: #7B2FBE;
+    --primary-light: #a855f7;
+    --muted: #737373;
+    --line: rgba(255,255,255,0.12);
+    --glass: rgba(18,18,18,0.94);
+    --tab-expanded: 49px;
+    --tab-collapsed: 52px;
+    --safe-b: 34px;
+    --phone-w: 393px;
+    --phone-h: 852px;
+    --radius-phone: 44px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: #0a0a0a;
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Arabic", sans-serif;
+    padding: 24px 16px 40px;
+  }
+  h1 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #aaa;
+    text-align: center;
+    margin: 0 0 6px;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 28px;
+    line-height: 1.5;
+  }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  .panel-label {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--primary-light);
+    margin-bottom: 10px;
+  }
+  .panel-desc {
+    text-align: center;
+    font-size: 11px;
+    color: #888;
+    max-width: 280px;
+    margin: 0 auto 12px;
+    line-height: 1.45;
+  }
+
+  /* ─── Phone shell ─── */
+  .phone {
+    width: var(--phone-w);
+    height: var(--phone-h);
+    border-radius: var(--radius-phone);
+    border: 3px solid #2a2a2a;
+    background: #000;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.65);
+  }
+  .status {
+    height: 54px;
+    padding: 14px 28px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .status .island {
+    width: 126px; height: 36px;
+    background: #1c1c1e;
+    border-radius: 20px;
+    margin: 0 auto;
+    position: absolute;
+    left: 50%; top: 11px;
+    transform: translateX(-50%);
+  }
+  .logo-bar {
+    height: 48px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: #000;
+  }
+  .logo-bar .seen {
+    font-size: 22px;
+    font-weight: 900;
+    background: linear-gradient(90deg, var(--primary), var(--primary-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .logo-bar .actions {
+    position: absolute;
+    right: 20px;
+    display: flex;
+    gap: 18px;
+    color: #fff;
+    font-size: 18px;
+  }
+
+  .feed {
+    flex: 1;
+    overflow: hidden;
+    padding: 0;
+  }
+  .feed-scroll {
+    height: calc(var(--phone-h) - 54px - 48px - var(--tab-expanded) - var(--safe-b));
+    overflow: hidden;
+  }
+  .feed-scroll.scrolled {
+    height: calc(var(--phone-h) - 54px - 48px - var(--tab-collapsed) - 10px - var(--safe-b));
+  }
+
+  .activity {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    gap: 12px;
+  }
+  .av {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3a2a55, #1a1020);
+    flex-shrink: 0;
+  }
+  .act-body { flex: 1; min-width: 0; }
+  .act-name { font-size: 15px; font-weight: 700; }
+  .act-meta { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .act-title { font-size: 15px; font-weight: 600; margin-top: 6px; }
+  .poster-sm {
+    width: 56px; height: 84px;
+    border-radius: 6px;
+    background: linear-gradient(160deg, #2a3550, #121820);
+    border: 1px solid var(--line);
+    margin-top: 8px;
+  }
+  .badge {
+    float: right;
+    margin-top: 8px;
+    background: rgba(46,204,113,0.2);
+    color: #2ECC71;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 4px 8px;
+    border-radius: 8px;
+  }
+
+  /* ─── Tab bar (matches ChromeTabBarView) ─── */
+  .tab-shell {
+    position: absolute;
+    left: 0; right: 0;
+    bottom: 0;
+    padding-bottom: var(--safe-b);
+    z-index: 10;
+  }
+
+  .tabbar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-around;
+    height: var(--tab-expanded);
+    padding-top: 6px;
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 0.5px solid var(--line);
+    width: 100%;
+    border-radius: 0;
+    margin: 0;
+    transition: all 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .tabbar.collapsed {
+    width: var(--tab-collapsed);
+    height: var(--tab-collapsed);
+    margin: 0 0 10px 14px;
+    border-radius: 26px;
+    border: 1px solid rgba(255,255,255,0.14);
+    border-top: 1px solid rgba(255,255,255,0.14);
+    padding-top: 0;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.55);
+  }
+
+  .tabbar.collapsed.explore {
+    width: calc(100% - 28px);
+    height: var(--tab-collapsed);
+    margin: 0 14px 10px;
+    padding: 0 8px;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    min-width: 0;
+  }
+  .tab .icon {
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted);
+    font-size: 22px;
+  }
+  .tab .label {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+  .tab.active .icon,
+  .tab.active .label { color: var(--primary); }
+
+  .tabbar.collapsed .tab:not(.active) {
+    display: none;
+  }
+  .tabbar.collapsed .tab.active {
+    flex: 0 0 auto;
+  }
+  .tabbar.collapsed .tab .label { display: none; }
+
+  .collapse-search {
+    display: none;
+    flex: 1;
+    height: 40px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    align-items: center;
+    gap: 8px;
+    padding: 0 14px;
+    color: var(--muted);
+    font-size: 16px;
+  }
+  .tabbar.collapsed.explore .collapse-search {
+    display: flex;
+  }
+
+  .home-icon-filled path { fill: var(--primary); }
+  .home-icon-outline path { fill: none; stroke: var(--muted); stroke-width: 1.8; }
+
+  .note-box {
+    max-width: 900px;
+    margin: 32px auto 0;
+    padding: 16px 18px;
+    background: #141414;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    font-size: 12px;
+    color: #999;
+    line-height: 1.55;
+  }
+  .note-box strong { color: #ccc; }
+  .note-box ul { margin: 8px 0 0; padding-right: 18px; }
+
+  svg.sym { width: 24px; height: 24px; }
+</style>
+</head>
+<body>
+
+<h1>التاب بار الحالي في الكود — كيف يطلع لما تفتح التطبيق</h1>
+<p class="subtitle">سكيتش مطابق لـ <code>ChromeTabBarView</code> بعد إصلاح 32f09594<br>بار واحد زجاجي — يصغر ويرجع (ما في تابات مكررة)</p>
+
+<div class="row">
+
+  <!-- 1: فتح التطبيق — Home موسّع -->
+  <div>
+    <div class="panel-label">① فتح التطبيق (Home)</div>
+    <p class="panel-desc">الشكل الافتراضي — بار زجاجي كامل عرض الشاشة، 49pt، خط فاصل فوق، 5 تابات</p>
+    <div class="phone" id="phone-open">
+      <div class="status"><span>01:20</span><div class="island"></div><span>68%</span></div>
+      <header class="logo-bar">
+        <span class="seen">Seen</span>
+        <div class="actions">🔔 💬</div>
+      </header>
+      <div class="feed-scroll">
+        <div class="activity">
+          <div class="av"></div>
+          <div class="act-body">
+            <div class="act-name">NOMAD <span style="color:var(--muted);font-weight:400">· 1m ago</span></div>
+            <div class="act-meta">Added to Want to Watch</div>
+            <div class="act-title">Marianne</div>
+            <div class="poster-sm"></div>
+          </div>
+        </div>
+        <div class="activity">
+          <div class="av" style="background:linear-gradient(135deg,#2a4a3a,#101820)"></div>
+          <div class="act-body">
+            <div class="act-name">Mohammed <span style="color:var(--muted);font-weight:400">· 18m ago</span></div>
+            <div class="act-meta">Watched S01E07</div>
+            <div class="act-title">Lucky</div>
+            <span class="badge">+8</span>
+            <div class="poster-sm" style="background:linear-gradient(160deg,#553a2a,#201510)"></div>
+          </div>
+        </div>
+        <div class="activity">
+          <div class="av"></div>
+          <div class="act-body">
+            <div class="act-name">NOMAD <span style="color:var(--muted);font-weight:400">· 23h ago</span></div>
+            <div class="act-meta">Watched S01E04</div>
+            <div class="act-title">The Agency</div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-shell">
+        <nav class="tabbar" aria-label="Tab bar expanded">
+          <div class="tab active">
+            <div class="icon">
+              <svg class="sym home-icon-filled" viewBox="0 0 24 24"><path d="M4 10.5L12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H8v6H5a1 1 0 0 1-1-1v-9.5Z"/></svg>
+            </div>
+            <span class="label">Home</span>
+          </div>
+          <div class="tab">
+            <div class="icon">📺</div>
+            <span class="label">Shows</span>
+          </div>
+          <div class="tab">
+            <div class="icon">🎬</div>
+            <span class="label">Movies</span>
+          </div>
+          <div class="tab">
+            <div class="icon">🔍</div>
+            <span class="label">Explore</span>
+          </div>
+          <div class="tab">
+            <div class="icon">👤</div>
+            <span class="label">Profile</span>
+          </div>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2: سكرول — Home مصغّر -->
+  <div>
+    <div class="panel-label">② بعد السكرول (Home)</div>
+    <p class="panel-desc">نفس البار يصغر لـ 52×52 دائرة — أيقونة Home بنفسجي فقط — اضغطها يرجع موسّع</p>
+    <div class="phone">
+      <div class="status"><span>01:20</span><div class="island"></div><span>68%</span></div>
+      <header class="logo-bar">
+        <span class="seen">Seen</span>
+        <div class="actions">🔔 💬</div>
+      </header>
+      <div class="feed-scroll scrolled" style="opacity:0.85">
+        <div class="activity" style="opacity:0.5"><div class="av"></div><div class="act-body"><div class="act-name">NOMAD</div><div class="act-title">Marianne</div></div></div>
+        <div class="activity"><div class="av"></div><div class="act-body"><div class="act-name">Mohammed</div><div class="act-title">Lucky</div></div></div>
+        <div class="activity"><div class="av"></div><div class="act-body"><div class="act-name">NOMAD</div><div class="act-title">Furious</div></div></div>
+        <div class="activity"><div class="av"></div><div class="act-body"><div class="act-name">NOMAD</div><div class="act-title">The Agency</div></div></div>
+        <div class="activity"><div class="av"></div><div class="act-body"><div class="act-name">NOMAD</div><div class="act-title">NPR Tiny Desk</div></div></div>
+      </div>
+      <div class="tab-shell">
+        <nav class="tabbar collapsed" aria-label="Tab bar collapsed home">
+          <div class="tab active">
+            <div class="icon">
+              <svg class="sym home-icon-filled" viewBox="0 0 24 24"><path d="M4 10.5L12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H8v6H5a1 1 0 0 1-1-1v-9.5Z"/></svg>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3: Explore مصغّر -->
+  <div>
+    <div class="panel-label">③ سكرول على Explore</div>
+    <p class="panel-desc">البار يصبح pill بعرض الشاشة: أيقونة بحث + حقل Search shows, movies, people...</p>
+    <div class="phone">
+      <div class="status"><span>01:20</span><div class="island"></div><span>68%</span></div>
+      <header class="logo-bar">
+        <span class="seen">Seen</span>
+        <div class="actions">🔔 💬</div>
+      </header>
+      <div class="feed-scroll scrolled" style="padding:12px 16px">
+        <div style="font-size:28px;font-weight:800;margin-bottom:12px">Explore</div>
+        <div style="height:120px;background:linear-gradient(90deg,#1a2840,#0d1520);border-radius:14px;border:1px solid var(--line);margin-bottom:12px"></div>
+        <div style="font-size:12px;font-weight:800;color:var(--muted);margin-bottom:8px">TOP 10</div>
+        <div style="display:flex;gap:10px">
+          <div style="width:100px;height:140px;background:#1a1a1a;border-radius:10px;border:1px solid var(--line)"></div>
+          <div style="width:100px;height:140px;background:#1a1a1a;border-radius:10px;border:1px solid var(--line)"></div>
+          <div style="width:100px;height:140px;background:#1a1a1a;border-radius:10px;border:1px solid var(--line)"></div>
+        </div>
+      </div>
+      <div class="tab-shell">
+        <nav class="tabbar collapsed explore" aria-label="Tab bar collapsed explore">
+          <div class="tab active">
+            <div class="icon" style="color:var(--primary)">🔍</div>
+          </div>
+          <div class="collapse-search">
+            <span>🔍</span>
+            <span>Search shows, movies, people...</span>
+          </div>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="note-box">
+  <strong>مواصفات من الكود (ChromeTabBar.swift):</strong>
+  <ul>
+    <li><strong>زجاج:</strong> خلفية rgba(18,18,18,0.94) + blur (ultraThinMaterial)</li>
+    <li><strong>موسّع:</strong> عرض 100% · ارتفاع 49pt · خط أبيض 12% فوق · padding-top 6pt</li>
+    <li><strong>مصغّر:</strong> 52×52pt · radius 26 · margin 14px left + 10px bottom · border أبيض 14%</li>
+    <li><strong>ألوان:</strong> غير نشط #737373 · نشط #7B2FBE (seenPrimary)</li>
+    <li><strong>ما يطلع:</strong> تابات السيستم تحت — بار واحد فقط (SystemTabBarHider)</li>
+    <li><strong>سكرول &gt; 48pt</strong> → يصغر · اضغط أيقونة التاب الحالي → يرجع موسّع</li>
+  </ul>
+</div>
+
+</body>
+</html>
