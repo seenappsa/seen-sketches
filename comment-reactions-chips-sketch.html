@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ar" dir="ltr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Seen — Comment + reaction chips</title>
+<style>
+  :root {
+    --bg: #000;
+    --card: #0c0c0c;
+    --chip: #2a2438;
+    --chip-empty: #1a1a1a;
+    --chip-empty-fg: #5a5a5a;
+    --line: #1c1c1c;
+    --muted: #777;
+    --text: #f2f2f2;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    background: #050505;
+    color: var(--text);
+    padding: 18px 14px 90px;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 430px; margin: 0 auto; }
+  h1 { font-size: 21px; margin: 0 0 6px; }
+  .sub {
+    color: var(--muted); font-size: 13px; line-height: 1.55; margin: 0 0 14px;
+  }
+  .note {
+    background: #141414; border: 1px solid #262626; border-radius: 12px;
+    padding: 11px 12px; font-size: 12.5px; color: #bbb; line-height: 1.55; margin-bottom: 16px;
+  }
+  .note b { color: #fff; }
+  .note .ar { direction: rtl; text-align: right; display: block; margin-top: 6px; color: #ddd; }
+  .section {
+    font-size: 11px; font-weight: 800; letter-spacing: .6px; color: #666;
+    text-transform: uppercase; margin: 20px 0 10px;
+  }
+  .phone {
+    background: #000; border: 1px solid #222; border-radius: 24px;
+    padding: 14px 12px 16px; margin-bottom: 14px;
+  }
+  .phone.good { border-color: #2a3a2a; }
+  .phone.bad { border-color: #3a2222; }
+  .tag {
+    display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: .4px;
+    padding: 3px 8px; border-radius: 999px; margin-bottom: 10px;
+  }
+  .tag.good { background: #14301c; color: #3dd68c; }
+  .tag.bad { background: #301414; color: #ff6b6b; }
+
+  /* Comment card */
+  .cmt {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 12px 4px; border-bottom: 1px solid #151515;
+  }
+  .cmt:last-child { border-bottom: 0; }
+  .av {
+    width: 32px; height: 32px; border-radius: 50%; flex: 0 0 auto;
+    background: linear-gradient(145deg, #3a3a3a, #1a1a1a);
+    display: grid; place-items: center; font-size: 12px; font-weight: 700; color: #aaa;
+  }
+  .body { flex: 1; min-width: 0; }
+  .who { font-size: 13px; font-weight: 700; }
+  .who span { color: #666; font-weight: 500; font-size: 11px; margin-left: 6px; }
+  .txt {
+    font-size: 14px; line-height: 1.45; color: #e8e8e8; margin: 4px 0 10px;
+  }
+  .txt.ar { direction: rtl; text-align: right; }
+
+  /* Action row — LTR so "left" = visual left */
+  .actions {
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  }
+
+  .chip {
+    display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+    min-height: 28px; padding: 5px 10px; border-radius: 999px;
+    background: var(--chip); color: #fff; font-size: 13px; font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.06);
+    user-select: none; -webkit-tap-highlight-color: transparent;
+  }
+  .chip .n { font-variant-numeric: tabular-nums; font-size: 12px; font-weight: 700; }
+  .chip.empty {
+    background: var(--chip-empty);
+    color: var(--chip-empty-fg);
+    border-color: transparent;
+  }
+  .chip.empty .n { display: none; }
+  .chip.mine {
+    background: #3a2f55;
+    border-color: rgba(139,92,246,0.45);
+  }
+  .chip.comment {
+    background: #242424;
+  }
+  .chip.comment.empty {
+    background: var(--chip-empty);
+    color: var(--chip-empty-fg);
+  }
+  .chip.comment svg {
+    width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2;
+    stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* Current (bad) — react + reply text */
+  .old-actions {
+    display: flex; align-items: center; gap: 16px; margin-top: 2px;
+  }
+  .old-btn {
+    font-size: 12px; font-weight: 600; color: #808080;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .old-pills {
+    display: flex; gap: 6px; margin-bottom: 8px;
+  }
+  .old-pill {
+    display: inline-flex; align-items: center; gap: 3px;
+    background: #1e1e1e; border-radius: 999px; padding: 4px 8px; font-size: 12px;
+  }
+  .old-pill span { color: #777; font-size: 11px; font-weight: 600; }
+
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;
+  }
+  .legend i {
+    font-style: normal; font-size: 11px; color: #888;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .swatch {
+    width: 18px; height: 18px; border-radius: 999px; display: inline-block;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .swatch.on { background: var(--chip); }
+  .swatch.off { background: var(--chip-empty); }
+
+  .tap {
+    margin-top: 14px; padding: 10px 12px; border-radius: 12px;
+    background: #101018; border: 1px dashed #333; font-size: 12px; color: #999; line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Comment row chips</h1>
+  <p class="sub">Sketch only — no app code changed yet.</p>
+
+  <div class="note">
+    <b>Rule</b>
+    <span class="ar">
+      يسار: زر الكومنت، جنبه كل الرياكشنز.<br>
+      إذا العدد = 0 → لون أخف وبدون رقم.<br>
+      إذا فيه عدد → كبسولة أوضح + الرقم.
+    </span>
+  </div>
+
+  <div class="section">Proposed — with counts</div>
+  <div class="phone good">
+    <span class="tag good">PROPOSED</span>
+
+    <div class="cmt">
+      <div class="av">S</div>
+      <div class="body">
+        <div class="who">sara <span>2h</span></div>
+        <div class="txt">This episode was insane — the last 10 minutes 🔥</div>
+        <div class="actions" aria-label="actions">
+          <!-- LEFT = comment -->
+          <button class="chip comment" type="button" title="Comments">
+            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span class="n">8</span>
+          </button>
+          <button class="chip mine" type="button">❤️ <span class="n">8</span></button>
+          <button class="chip" type="button">👍 <span class="n">7</span></button>
+          <button class="chip" type="button">👏 <span class="n">7</span></button>
+          <button class="chip empty" type="button">🔥 <span class="n">0</span></button>
+          <button class="chip empty" type="button">😂 <span class="n">0</span></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="cmt">
+      <div class="av">أ</div>
+      <div class="body">
+        <div class="who">أحمد <span>1h</span></div>
+        <div class="txt ar">فريق تمرة المالية</div>
+        <div class="actions">
+          <button class="chip comment" type="button">
+            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span class="n">3</span>
+          </button>
+          <button class="chip" type="button">❤️ <span class="n">8</span></button>
+          <button class="chip" type="button">👍 <span class="n">7</span></button>
+          <button class="chip" type="button">👏 <span class="n">7</span></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <i><span class="swatch on"></span> has count</i>
+      <i><span class="swatch off"></span> empty = lighter, no number</i>
+    </div>
+  </div>
+
+  <div class="section">Proposed — all empty</div>
+  <div class="phone good">
+    <span class="tag good">EMPTY STATE</span>
+    <div class="cmt">
+      <div class="av">N</div>
+      <div class="body">
+        <div class="who">nora <span>just now</span></div>
+        <div class="txt">First!</div>
+        <div class="actions">
+          <button class="chip comment empty" type="button">
+            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span class="n">0</span>
+          </button>
+          <button class="chip empty" type="button">❤️ <span class="n">0</span></button>
+          <button class="chip empty" type="button">👍 <span class="n">0</span></button>
+          <button class="chip empty" type="button">👏 <span class="n">0</span></button>
+          <button class="chip empty" type="button">🔥 <span class="n">0</span></button>
+          <button class="chip empty" type="button">😂 <span class="n">0</span></button>
+        </div>
+      </div>
+    </div>
+    <div class="tap">
+      Tap any empty chip → becomes active + shows <b>1</b>. Tap again to clear.
+      No double-tap needed to switch emoji — every reaction is already visible.
+    </div>
+  </div>
+
+  <div class="section">Compact variant — only top reactions + empties collapsed</div>
+  <div class="phone good">
+    <span class="tag good">ALT · less crowded</span>
+    <div class="cmt">
+      <div class="av">M</div>
+      <div class="body">
+        <div class="who">mona <span>4h</span></div>
+        <div class="txt">Better than season 1 tbh</div>
+        <div class="actions">
+          <button class="chip comment" type="button">
+            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span class="n">2</span>
+          </button>
+          <button class="chip" type="button">❤️ <span class="n">8</span></button>
+          <button class="chip" type="button">👍 <span class="n">7</span></button>
+          <button class="chip empty" type="button">＋</button>
+        </div>
+      </div>
+    </div>
+    <div class="tap">
+      Left = comment. Next = active reactions. Trailing faded <b>＋</b> opens the rest (🔥😂😮…).
+    </div>
+  </div>
+
+  <div class="section">Current (for comparison)</div>
+  <div class="phone bad">
+    <span class="tag bad">CURRENT</span>
+    <div class="cmt">
+      <div class="av">S</div>
+      <div class="body">
+        <div class="who">sara <span>2h</span></div>
+        <div class="txt">This episode was insane — the last 10 minutes 🔥</div>
+        <div class="old-pills">
+          <div class="old-pill">❤️ <span>8</span></div>
+          <div class="old-pill">👍 <span>7</span></div>
+          <div class="old-pill">👏 <span>7</span></div>
+        </div>
+        <div class="old-actions">
+          <span class="old-btn">😊 React</span>
+          <span class="old-btn">Reply</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Interactive empty → filled for the sketch
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const n = chip.querySelector('.n');
+      if (!n) return;
+      const isComment = chip.classList.contains('comment');
+      if (chip.classList.contains('empty')) {
+        chip.classList.remove('empty');
+        if (!isComment) chip.classList.add('mine');
+        n.textContent = '1';
+      } else {
+        // toggle off
+        chip.classList.add('empty');
+        chip.classList.remove('mine');
+        n.textContent = '0';
+      }
+    });
+  });
+</script>
+</body>
+</html>
