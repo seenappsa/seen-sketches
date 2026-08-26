@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<title>Seen — Movie Rewatch Sketch</title>
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --card: #16161a;
+    --card2: #1e1e24;
+    --line: #2a2a32;
+    --purple: #8b5cf6;
+    --green: #22c55e;
+    --green-dim: rgba(34, 197, 94, 0.15);
+    --green-text: #2ecc71;
+    --red: #ff453a;
+    --text: #f5f5f7;
+    --muted: #9a9aa3;
+    --dim: #5c5c66;
+    --safe-t: env(safe-area-inset-top, 0px);
+    --safe-b: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0;
+    background: #000;
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    min-height: 100%;
+  }
+  body { display: flex; justify-content: center; }
+  .phone {
+    width: 100%;
+    max-width: 430px;
+    min-height: 100dvh;
+    background: var(--bg);
+    position: relative;
+    padding-bottom: calc(100px + var(--safe-b));
+  }
+
+  /* Tabs */
+  .tabs {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(10,10,12,0.92);
+    backdrop-filter: blur(16px);
+    padding: calc(10px + var(--safe-t)) 12px 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .tabs-row {
+    display: flex; gap: 6px; overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tabs-row::-webkit-scrollbar { display: none; }
+  .tab {
+    flex: 0 0 auto;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--muted);
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 12px; font-weight: 700;
+    white-space: nowrap;
+  }
+  .tab.on { background: var(--purple); border-color: var(--purple); color: #fff; }
+
+  .screen { display: none; padding: 16px; }
+  .screen.on { display: block; }
+
+  h2 { font-size: 22px; font-weight: 800; margin: 0 0 6px; letter-spacing: -0.3px; }
+  .sub { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 18px; }
+  .note {
+    background: #1a1430;
+    border: 1px solid #3b2d6b;
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-size: 12px;
+    color: #c4b5fd;
+    line-height: 1.55;
+    margin-bottom: 16px;
+  }
+  .note strong { color: #e9d5ff; }
+
+  /* Movie detail mock */
+  .poster-wrap {
+    display: flex; gap: 14px; align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  .poster {
+    width: 110px; height: 165px;
+    border-radius: 12px;
+    background: linear-gradient(145deg, #2a2040, #121218);
+    border: 1px solid var(--line);
+    flex-shrink: 0;
+    display: flex; align-items: flex-end; justify-content: center;
+    font-size: 10px; color: var(--dim); padding: 8px;
+    text-align: center;
+  }
+  .meta h3 { margin: 0 0 4px; font-size: 20px; font-weight: 800; }
+  .meta .year { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+
+  .status-row {
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    margin-bottom: 12px;
+  }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-size: 12px; font-weight: 700;
+  }
+  .pill-watched {
+    background: var(--green-dim);
+    color: var(--green-text);
+    border: 1px solid rgba(34,197,94,0.25);
+  }
+  .pill-count {
+    background: rgba(139,92,246,0.15);
+    color: #c4b5fd;
+    border: 1px solid rgba(139,92,246,0.35);
+    cursor: pointer;
+  }
+  .pill-count:active { transform: scale(0.97); }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    border: 0; border-radius: 999px;
+    padding: 10px 16px;
+    font-size: 13px; font-weight: 700;
+    cursor: pointer;
+  }
+  .btn-rewatch {
+    background: var(--green-dim);
+    color: var(--green-text);
+    border: 1px solid rgba(34,197,94,0.3);
+  }
+  .btn-rewatch:active { opacity: 0.85; }
+  .btn-ghost {
+    background: var(--card);
+    color: var(--muted);
+    border: 1px solid var(--line);
+  }
+
+  /* List row */
+  .row {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+  .row-poster {
+    width: 48px; height: 72px; border-radius: 8px;
+    background: #222; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .row-info { flex: 1; min-width: 0; }
+  .row-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .row-sub { font-size: 12px; color: var(--muted); }
+  .check {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--green);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 14px; font-weight: 800;
+  }
+
+  /* Flow steps */
+  .flow {
+    display: flex; flex-direction: column; gap: 10px;
+    margin: 16px 0;
+  }
+  .step {
+    display: flex; gap: 12px; align-items: flex-start;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px 14px;
+  }
+  .step-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--purple);
+    color: #fff;
+    font-size: 13px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-body { font-size: 13px; line-height: 1.5; color: var(--muted); }
+  .step-body strong { color: var(--text); }
+
+  /* Overlay / sheet */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 200;
+    padding: 16px;
+    padding-bottom: calc(16px + var(--safe-b));
+  }
+  .overlay.show { display: flex; }
+  .sheet {
+    width: 100%; max-width: 430px;
+    background: #1c1c22;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    overflow: hidden;
+    animation: slideUp 0.28s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(24px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .sheet-title {
+    padding: 18px 18px 8px;
+    font-size: 17px; font-weight: 800;
+    text-align: center;
+  }
+  .sheet-msg {
+    padding: 0 18px 16px;
+    font-size: 13px; color: var(--muted);
+    text-align: center; line-height: 1.5;
+  }
+  .sheet-btn {
+    width: 100%;
+    border: 0;
+    border-top: 1px solid var(--line);
+    background: transparent;
+    color: var(--green-text);
+    font-size: 17px; font-weight: 700;
+    padding: 16px;
+    cursor: pointer;
+  }
+  .sheet-btn.danger { color: var(--red); }
+  .sheet-btn.cancel { color: var(--muted); font-weight: 600; }
+
+  .counter-demo {
+    text-align: center;
+    padding: 20px;
+    background: var(--card);
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    margin: 16px 0;
+  }
+  .counter-big {
+    font-size: 48px; font-weight: 900;
+    color: var(--purple);
+    letter-spacing: -1px;
+  }
+  .counter-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+  .actions-row {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 14px;
+  }
+
+  .compare {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    margin-top: 12px;
+  }
+  .compare-box {
+    background: var(--card);
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    padding: 12px;
+    font-size: 11px;
+  }
+  .compare-box.bad { border-color: #5c2a2a; background: #1a1010; }
+  .compare-box.good { border-color: #1f4d2e; background: #0f1812; }
+  .compare-box h4 { margin: 0 0 8px; font-size: 12px; }
+  .compare-box.bad h4 { color: #ff6b6b; }
+  .compare-box.good h4 { color: var(--green-text); }
+
+  .footer-hint {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    display: flex; justify-content: center;
+    padding: 10px 16px calc(10px + var(--safe-b));
+    background: rgba(10,10,12,0.95);
+    border-top: 1px solid var(--line);
+    font-size: 11px; color: var(--dim);
+    text-align: center;
+    z-index: 40;
+  }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="tabs">
+    <div class="tabs-row">
+      <button class="tab on" data-screen="demo">تجربة حية</button>
+      <button class="tab" data-screen="flow">الفلو</button>
+      <button class="tab" data-screen="fix">تصحيح ×4 → ×3</button>
+      <button class="tab" data-screen="rules">القواعد</button>
+    </div>
+  </div>
+
+  <!-- LIVE DEMO -->
+  <div id="demo" class="screen on">
+    <h2>🎬 Rewatch — أفلام</h2>
+    <p class="sub">بدون حلقات. عداد بسيط: أول مشاهدة = Watched، كل Rewatch = ×2, ×3…</p>
+
+    <div class="note">
+      <strong>الفرق عن المسلسلات:</strong> المسلسل = Rewatching section + تقدم حلقة حلقة.<br>
+      الفilm = زر واحد + badge <strong>×N</strong> جنب Watched — ما فيه episodes.
+    </div>
+
+    <div class="poster-wrap">
+      <div class="poster">Poster</div>
+      <div class="meta">
+        <h3 id="movieTitle">Oppenheimer</h3>
+        <div class="year">2023 · 3h 0m</div>
+        <div class="status-row">
+          <span class="pill pill-watched">✓ Watched</span>
+          <span class="pill pill-count" id="countBadge" style="display:none" onclick="openAdjust()">×<span id="countNum">2</span></span>
+        </div>
+        <button class="btn btn-rewatch" onclick="openRewatchConfirm()">
+          ↺ Rewatch
+        </button>
+      </div>
+    </div>
+
+    <div class="counter-demo">
+      <div class="counter-big">×<span id="counterDisplay">1</span></div>
+      <div class="counter-label" id="counterLabel">أول مشاهدة (Watched)</div>
+      <div class="actions-row">
+        <button class="btn btn-rewatch" onclick="openRewatchConfirm()">+ Rewatch</button>
+        <button class="btn btn-ghost" id="adjustBtn" style="display:none" onclick="openAdjust()">تعديل العداد</button>
+      </div>
+    </div>
+
+    <p class="sub" style="margin-top:8px">في قائمة الأفلام (Movies tab):</p>
+    <div class="row">
+      <div class="row-poster">🎬</div>
+      <div class="row-info">
+        <div class="row-title" id="rowTitle">Oppenheimer</div>
+        <div class="row-sub" id="rowSub">Watched · Dec 12, 2025</div>
+      </div>
+      <div class="check">✓</div>
+    </div>
+  </div>
+
+  <!-- FLOW -->
+  <div id="flow" class="screen">
+    <h2>الفلو المطلوب</h2>
+    <p class="sub">كل ضغطة Rewatch = تأكيد → ثم +1 على العداد</p>
+
+    <div class="flow">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>أول مرة تشوف الفilm</strong><br>
+          تضغط ✓ → يصير <strong>Watched</strong> (×1 — بدون ما يطلع رقم)
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>تبي Rewatch</strong><br>
+          تضغط <strong>Rewatch</strong> → popup: «تبي تسجل إعادة مشاهدة؟»
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>تضغط «أيه»</strong><br>
+          يصير جنب Watched: <strong>×2</strong> — ما يمسح المشاهدة الأولى
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Rewatch مرة ثانية</strong><br>
+          نفس popup → أيه → <strong>×3</strong> … وهكذا
+        </div>
+      </div>
+    </div>
+
+    <div class="compare">
+      <div class="compare-box bad">
+        <h4>❌ الحالي (غلط)</h4>
+        «Starts a rewatch pass. Mark episodes as you go…»<br><br>
+        نص حلقات على فيلم 🙃
+      </div>
+      <div class="compare-box good">
+        <h4>✅ المقترح</h4>
+        «Record another full watch?»<br><br>
+        «سجّلنا إنك شفت [الفilm] مرة ثانية. العداد: ×2»
+      </div>
+    </div>
+  </div>
+
+  <!-- FIX COUNT -->
+  <div id="fix" class="screen">
+    <h2>×4 وانت شايفه 3؟</h2>
+    <p class="sub">لازم طريقة تنقص — بدون ما تمسح Watched كامل</p>
+
+    <div class="note">
+      <strong>الفكرة:</strong> العداد <strong>×N</strong> يكون قابل للضغط (أو long-press على Rewatch).
+      يفتح sheet «تعديل عدد المشاهدات».
+    </div>
+
+    <div class="flow">
+      <div class="step">
+        <div class="step-num">A</div>
+        <div class="step-body">
+          <strong>اضغط على badge ×4</strong><br>
+          (أو «تعديل العداد» من تفاصيل الفilm)
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">B</div>
+        <div class="step-body">
+          <strong>«Remove one rewatch»</strong> / «إزالة مشاهدة واحدة»<br>
+          popup: «تbi تصير ×3 بدل ×4؟» → أيه
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">C</div>
+        <div class="step-body">
+          <strong>أو «Set count…»</strong><br>
+          picker: 1, 2, 3, 4… — تختار 3 → save
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">D</div>
+        <div class="step-body">
+          <strong>×1 = Watched عادي</strong><br>
+          الـ badge يختفي — ما فيه «unwatch» إلا لو شلت ✓ Watched كامل
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-ghost" style="width:100%; margin-top:8px" onclick="simulateFix()">
+      🎬 جرّب: ×4 → إزالة واحدة → ×3
+    </button>
+    <p class="sub" id="fixResult" style="text-align:center; min-height:20px"></p>
+  </div>
+
+  <!-- RULES -->
+  <div id="rules" class="screen">
+    <h2>قواعد التصميم</h2>
+    <div class="flow">
+      <div class="step">
+        <div class="step-num">🎬</div>
+        <div class="step-body">
+          <strong>أفلام فقط</strong> — <code>watchCount</code> على SavedMovie، بدون episode rewatch histogram
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">📺</div>
+        <div class="step-body">
+          <strong>مسلسلات</strong> — تبقى Rewatching section + حلقات (ما تتغير)
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">×N</div>
+        <div class="step-body">
+          <strong>العرض:</strong> ×1 = Watched بدون badge · ×2+ = badge بنفسجي/أخضر جنب Watched
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">↺</div>
+        <div class="step-body">
+          <strong>Rewatch</strong> = +1 بعد confirm · <strong>Unwatch ✓</strong> = يرجع Want / يمسح watched (confirm منفصل)
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">📊</div>
+        <div class="step-body">
+          <strong>Profile stats</strong> — «Rewatched movies» = count where watchCount &gt; 1
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Rewatch confirm -->
+<div class="overlay" id="rewatchOverlay" onclick="if(event.target===this) closeAll()">
+  <div class="sheet">
+    <div class="sheet-title">Rewatch؟</div>
+    <div class="sheet-msg" id="rewatchMsg">
+      تbi تسجّل إنك شفت <strong>Oppenheimer</strong> مرة ثانية؟<br>
+      <span style="color:#c4b5fd">بعد التأكيد: Watched ×2</span>
+    </div>
+    <button class="sheet-btn" onclick="confirmRewatch()">أيه، Rewatch</button>
+    <button class="sheet-btn cancel" onclick="closeAll()">إلغاء</button>
+  </div>
+</div>
+
+<!-- Adjust count -->
+<div class="overlay" id="adjustOverlay" onclick="if(event.target===this) closeAll()">
+  <div class="sheet">
+    <div class="sheet-title">تعديل عدد المشاهدات</div>
+    <div class="sheet-msg">
+      الحالي: <strong id="adjustCurrent">×4</strong><br>
+      Oppenheimer — كم مرة شفته فعلياً؟
+    </div>
+    <button class="sheet-btn" onclick="removeOne()">إزالة مشاهدة واحدة (−1)</button>
+    <button class="sheet-btn" onclick="setCount(3)">تعيين إلى ×3</button>
+    <button class="sheet-btn" onclick="setCount(1)">رجوع لـ Watched فقط (×1)</button>
+    <button class="sheet-btn cancel" onclick="closeAll()">إلغاء</button>
+  </div>
+</div>
+
+<div class="footer-hint">Seen sketch · Movie Rewatch v1 · افتح من Safari على الجوال</div>
+
+<script>
+  let watchCount = 1;
+  const title = 'Oppenheimer';
+
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
+      document.querySelectorAll('.screen').forEach(x => x.classList.remove('on'));
+      t.classList.add('on');
+      document.getElementById(t.dataset.screen).classList.add('on');
+    });
+  });
+
+  function updateUI() {
+    document.getElementById('counterDisplay').textContent = watchCount;
+    const badge = document.getElementById('countBadge');
+    const adjustBtn = document.getElementById('adjustBtn');
+    const countNum = document.getElementById('countNum');
+    const rowSub = document.getElementById('rowSub');
+
+    if (watchCount > 1) {
+      badge.style.display = 'inline-flex';
+      countNum.textContent = watchCount;
+      adjustBtn.style.display = 'inline-flex';
+      document.getElementById('counterLabel').textContent =
+        'شفت الفilm ' + watchCount + ' مرات';
+      rowSub.textContent = 'Watched ×' + watchCount + ' · Dec 12, 2025';
+    } else {
+      badge.style.display = 'none';
+      adjustBtn.style.display = 'none';
+      document.getElementById('counterLabel').textContent = 'أول مشاهدة (Watched)';
+      rowSub.textContent = 'Watched · Dec 12, 2025';
+    }
+    document.getElementById('adjustCurrent').textContent = '×' + watchCount;
+  }
+
+  function openRewatchConfirm() {
+    const next = watchCount + 1;
+    document.getElementById('rewatchMsg').innerHTML =
+      'تbi تسجّل إنك شفت <strong>' + title + '</strong> مرة ثانية؟<br>' +
+      '<span style="color:#c4b5fd">بعد التأكيد: Watched ×' + next + '</span>';
+    document.getElementById('rewatchOverlay').classList.add('show');
+  }
+
+  function confirmRewatch() {
+    watchCount++;
+    updateUI();
+    closeAll();
+    if (navigator.vibrate) navigator.vibrate(10);
+  }
+
+  function openAdjust() {
+    document.getElementById('adjustOverlay').classList.add('show');
+  }
+
+  function removeOne() {
+    if (watchCount > 1) watchCount--;
+    updateUI();
+    closeAll();
+  }
+
+  function setCount(n) {
+    watchCount = Math.max(1, n);
+    updateUI();
+    closeAll();
+  }
+
+  function closeAll() {
+    document.querySelectorAll('.overlay').forEach(o => o.classList.remove('show'));
+  }
+
+  function simulateFix() {
+    watchCount = 4;
+    updateUI();
+    document.getElementById('fixResult').textContent = 'صار ×4 — اضغط «تعديل العداد» أو badge ×4';
+    document.querySelector('[data-screen="demo"]').click();
+    setTimeout(openAdjust, 400);
+  }
+
+  updateUI();
+</script>
+</body>
+</html>
