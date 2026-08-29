@@ -3,100 +3,79 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<title>Seen · زر الهوم (Vector حاد)</title>
+<title>Seen · زر الهوم (شكل صورتك)</title>
 <style>
-:root{
-  --bg:#050505;--card:#121212;--line:rgba(255,255,255,.1);
-  --muted:#8a8a8a;--purple:#7B2FBE;--purple2:#a855f7;--gold:#f0c73d;
-  --safe:env(safe-area-inset-bottom,16px);
-}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:var(--bg);color:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Arabic",sans-serif;padding-bottom:calc(110px + var(--safe))}
-.top{position:sticky;top:0;z-index:40;background:rgba(5,5,5,.94);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--line);padding:14px 14px 10px}
+:root{--bg:#050505;--card:#121212;--line:rgba(255,255,255,.1);--muted:#888;--purple:#7B2FBE;--purple2:#a855f7;--gold:#f0c73d;--safe:env(safe-area-inset-bottom,16px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF Arabic",sans-serif;padding-bottom:calc(110px + var(--safe))}
+.top{position:sticky;top:0;z-index:20;background:rgba(5,5,5,.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding:14px}
 h1{margin:0;font-size:17px;font-weight:800;text-align:center}
-.sub{margin:5px 0 0;text-align:center;font-size:12px;color:#777;line-height:1.45}
-.nav{display:flex;gap:8px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}
-.nav::-webkit-scrollbar{display:none}
-.nav a{flex:0 0 auto;text-decoration:none;color:#ccc;font-size:12px;font-weight:700;padding:8px 12px;border-radius:999px;background:#1a1a1a;border:1px solid var(--line)}
+.sub{margin:6px 0 0;text-align:center;font-size:12px;color:#777;line-height:1.45}
 main{padding:16px 14px}
-section{margin:0 0 28px}
-.st{font-size:14px;font-weight:800;margin:0 0 6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.tag{font-size:10px;font-weight:800;padding:3px 7px;border-radius:6px;background:rgba(123,47,190,.22);color:var(--purple2)}
-.tag.ok{background:rgba(46,204,113,.16);color:#57d68d}
+section{margin:0 0 26px}
+.st{font-size:14px;font-weight:800;margin:0 0 8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tag{font-size:10px;font-weight:800;padding:3px 7px;border-radius:6px;background:rgba(46,204,113,.16);color:#57d68d}
 .tag.warn{background:rgba(255,80,80,.14);color:#ff8f8f}
-.sd{font-size:12px;color:#888;margin:0 0 12px;line-height:1.55}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
 .alert{background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.28);color:#b8f0c8;border-radius:12px;padding:10px 12px;font-size:12px;line-height:1.5;margin-bottom:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:14px}
 .vs{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center}
-.box{background:#0a0a0a;border:1px solid var(--line);border-radius:14px;padding:14px 10px;text-align:center}
+.box{background:#0a0a0a;border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center}
 .ico-wrap{width:56px;height:56px;margin:0 auto 8px;display:grid;place-items:center}
-.ico-wrap svg{width:56px;height:56px;display:block}
-.mid{font-size:11px;color:#666;font-weight:800}
+.ico-wrap svg,.hero-icon svg,.glyph svg,.ic svg,.mini svg{display:block}
+.ico-wrap svg{width:56px;height:56px}
+.mid{font-weight:800;color:#666}
 .lbl{font-size:11px;font-weight:700}
-.bad{color:#ff8f8f}.good{color:#57d68d}
-.hero{display:flex;flex-direction:column;align-items:center;gap:12px;padding:18px 10px;margin-top:8px}
-.hero-icon{width:140px;height:140px;display:grid;place-items:center;background:#000;border-radius:28px;border:1px solid var(--line);color:#fff}
-.hero-icon svg{width:88px;height:88px;display:block}
+.good{color:#57d68d}.bad{color:#ff8f8f}
+.hero{display:flex;flex-direction:column;align-items:center;gap:12px;padding:18px 8px;margin-top:8px}
+.hero-icon{width:140px;height:140px;border-radius:28px;background:#000;border:1px solid var(--line);display:grid;place-items:center;color:#fff}
+.hero-icon svg{width:88px;height:88px}
 .hero-cap{font-size:12px;color:#aaa;text-align:center;line-height:1.45}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media(min-width:640px){.grid{grid-template-columns:1fr 1fr 1fr}}
-.opt{background:#101010;border:1px solid var(--line);border-radius:16px;padding:14px 10px 12px;text-align:center;cursor:pointer;color:inherit;font:inherit;width:100%}
+.opt{background:#101010;border:1px solid var(--line);border-radius:16px;padding:12px;text-align:center;color:inherit;font:inherit;cursor:pointer;width:100%}
 .opt.sel{border-color:var(--purple2);box-shadow:0 0 0 1px rgba(168,85,247,.35)}
-.pv{height:72px;display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:8px}
+.pv{height:70px;display:flex;align-items:center;justify-content:center;gap:16px}
 .d{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted)}
 .d.on{color:var(--purple)}.d.on.gold{color:var(--gold)}
 .d span{font-size:9px;color:#666}
-.chip{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#2a2a2c;color:#fff}
-.chip.glow{background:rgba(123,47,190,.3);box-shadow:0 0 16px rgba(123,47,190,.25)}
-.glyph{width:28px;height:28px;display:block}
-.glyph svg,.ico{width:28px;height:28px;display:block}
-.nm{font-size:13px;font-weight:800}
-.wh{font-size:11px;color:#888;margin-top:5px;line-height:1.4}
+.chip{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#2a2a2c;color:inherit}
+.chip.glow{background:rgba(123,47,190,.3)}
+.glyph svg,.ic svg{width:28px;height:28px}
+.nm{font-size:13px;font-weight:800;margin-top:6px}
+.wh{font-size:11px;color:#888;margin-top:4px;line-height:1.4}
 .compare{display:grid;gap:12px}
 @media(min-width:760px){.compare{grid-template-columns:1fr 1fr}}
-.phone{width:min(100%,340px);margin:0 auto;border-radius:34px;border:2.5px solid #2a2a2a;background:#000;overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.5)}
-.status{height:46px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 20px 8px;font-size:12px;font-weight:700;position:relative}
-.island{position:absolute;left:50%;top:10px;transform:translateX(-50%);width:104px;height:28px;border-radius:16px;background:#1a1a1c}
-.logo{height:40px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:center}
-.brand{font-size:19px;font-weight:900;background:linear-gradient(90deg,var(--purple),var(--purple2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.feed{height:100px;padding:10px 12px 0}
-.frow{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}
-.av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#3a2a55,#1a1020);flex:0 0 auto}
-.an{font-size:12.5px;font-weight:700}.am{font-size:11px;color:var(--muted);margin-top:1px}
-.tabbar{display:flex;height:58px;padding-top:8px;border-top:.5px solid var(--line);background:rgba(18,18,18,.96)}
-.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;color:var(--muted)}
+.phone{width:min(100%,340px);margin:0 auto;border:2.5px solid #2a2a2a;border-radius:34px;overflow:hidden;background:#000}
+.status{height:44px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 18px 8px;font-size:12px;font-weight:700;position:relative}
+.island{position:absolute;left:50%;top:10px;transform:translateX(-50%);width:100px;height:28px;border-radius:16px;background:#1a1a1c}
+.logo{height:40px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:900;background:linear-gradient(90deg,var(--purple),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.feed{height:90px;padding:10px 12px}
+.frow{display:flex;gap:10px}
+.av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#3a2a55,#1a1020)}
+.tabbar{display:flex;height:56px;border-top:.5px solid var(--line);padding-top:8px}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted)}
 .tab.on{color:var(--purple)}.tab.on.gold{color:var(--gold)}
-.tab .ic{width:30px;height:30px;display:grid;place-items:center}
-.tab .ic svg,.tab .ic .ico{width:26px;height:26px;display:block}
-.tab .lb{font-size:9.5px;font-weight:600}.tab.on .lb{font-weight:750}
-.note{font-size:11px;color:#777;text-align:center;margin-top:8px;line-height:1.45}
-.picked{padding:10px 12px;border-radius:12px;background:rgba(123,47,190,.12);border:1px solid rgba(168,85,247,.25);font-size:12px;color:#ddd;line-height:1.5}
-.live{position:fixed;left:12px;right:12px;bottom:calc(10px + var(--safe));z-index:50;background:rgba(18,18,18,.96);border:1px solid var(--line);border-radius:18px;padding:10px 12px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 10px 30px rgba(0,0,0,.45)}
-.live .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tab .ic svg{width:26px;height:26px}
+.tab .lb{font-size:9.5px}
+.note{font-size:11px;color:#777;text-align:center;margin-top:8px}
+.picked{padding:10px 12px;border-radius:12px;background:rgba(123,47,190,.12);border:1px solid rgba(168,85,247,.25);font-size:12px;line-height:1.5}
+.live{position:fixed;left:12px;right:12px;bottom:calc(10px + var(--safe));background:rgba(18,18,18,.96);border:1px solid var(--line);border-radius:18px;padding:10px 12px;z-index:30}
+.live .row{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .live .t{font-size:12px;font-weight:800}.live .s{font-size:11px;color:#888}
-.mini{display:flex;gap:2px;background:#0c0c0c;border-radius:14px;padding:6px 4px;border:1px solid var(--line);min-width:180px}
-.mini .t{flex:1;display:grid;place-items:center;color:#666;padding:4px 0}
+.mini{display:flex;gap:2px;background:#0c0c0c;border-radius:14px;padding:6px 4px;border:1px solid var(--line);min-width:170px}
+.mini .t{flex:1;display:grid;place-items:center;color:#666}
 .mini .t.on{color:var(--purple)}.mini .t.on.gold{color:var(--gold)}
 .mini svg{width:18px;height:18px}
-.foot{margin:8px 14px 0;text-align:center;font-size:11px;color:#555;line-height:1.5}
 </style>
 </head>
 <body>
 <header class="top">
-  <h1>زر الهوم · Vector حاد</h1>
-  <p class="sub">نفس الشكل filled · بدون بيكسلز<br/>التحديد = بنفسجي Seen</p>
-  <nav class="nav">
-    <a href="#fix">الإصلاح</a>
-    <a href="#opts">الخيارات</a>
-    <a href="#bar">التاب بار</a>
-  </nav>
+  <h1>زر الهوم · شكل صورتك</h1>
+  <p class="sub">رجّعنا البيت الـ filled المدبّب (مو القبة)<br/>Vector ناعم · التحديد بنفسجي Seen</p>
 </header>
-
 <main>
-<section id="fix">
-  <div class="st">الرزلوشن <span class="tag ok">Fixed · SVG/PDF</span></div>
-  <div class="alert">المشكلة كانت PNG صغير متكبّر. الحين الأيقونة <b>Vector</b> (SVG هنا + PDF في التطبيق) — الأطراف ناعمة بأي حجم.</div>
+<section>
+  <div class="st">رجعة للشكل الصح <span class="tag">Restored</span></div>
+  <div class="alert">القبة اللي قبل كانت غلط. هذا <b>نفس بيت صورتك</b> (قمة أوضح + باب مقوّس) كـ SVG/PDF — بدون بيكسلز.</div>
   <div class="card">
     <div class="vs">
       <div class="box">
@@ -108,44 +87,43 @@ section{margin:0 0 28px}
       <div class="mid">→</div>
       <div class="box">
         <div class="ico-wrap" style="color:#fff">
-          <svg viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd"><path d="M12 1.2C13.55 1.2 15.3 2.05 17.05 4.05C18.4 5.6 19.1 7.2 19.1 8.85V18.6C19.1 20.35 17.7 21.75 15.95 21.75H8.05C6.3 21.75 4.9 20.35 4.9 18.6V8.85C4.9 7.2 5.6 5.6 6.95 4.05C8.7 2.05 10.45 1.2 12 1.2ZM8.15 21.75V14.55C8.15 12.55 9.85 10.95 12 10.95C14.15 10.95 15.85 12.55 15.85 14.55V21.75H8.15Z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.5C13.2 1.5 16.5 5 19.8 10.2C21.2 11.5 21.3 12.5 21.3 13.5C21.3 16.5 21.3 18 21 19C20.6 21.2 19.2 21.8 17.5 21.8H14.85C14.85 18.5 14.2 15 12 15C9.8 15 9.15 18.5 9.15 21.8H6.5C4.8 21.8 3.4 21.2 3 19C2.7 18 2.7 16.5 2.7 13.5C2.7 12.5 2.8 11.5 4.2 10.2C7.5 5 10.8 1.5 12 1.5Z"/></svg>
         </div>
-        <div class="lbl good">صح · filled vector</div>
+        <div class="lbl good">صح · بيت صورتك</div>
       </div>
     </div>
     <div class="hero">
       <div class="hero-icon">
-        <svg viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd"><path d="M12 1.2C13.55 1.2 15.3 2.05 17.05 4.05C18.4 5.6 19.1 7.2 19.1 8.85V18.6C19.1 20.35 17.7 21.75 15.95 21.75H8.05C6.3 21.75 4.9 20.35 4.9 18.6V8.85C4.9 7.2 5.6 5.6 6.95 4.05C8.7 2.05 10.45 1.2 12 1.2ZM8.15 21.75V14.55C8.15 12.55 9.85 10.95 12 10.95C14.15 10.95 15.85 12.55 15.85 14.55V21.75H8.15Z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.5C13.2 1.5 16.5 5 19.8 10.2C21.2 11.5 21.3 12.5 21.3 13.5C21.3 16.5 21.3 18 21 19C20.6 21.2 19.2 21.8 17.5 21.8H14.85C14.85 18.5 14.2 15 12 15C9.8 15 9.15 18.5 9.15 21.8H6.5C4.8 21.8 3.4 21.2 3 19C2.7 18 2.7 16.5 2.7 13.5C2.7 12.5 2.8 11.5 4.2 10.2C7.5 5 10.8 1.5 12 1.5Z"/></svg>
       </div>
-      <div class="hero-cap">كبّرناه عمداً — لو كان PNG كان يتكسّر. هذا SVG ناعم.<br/>في التطبيق: template → بنفسجي Seen عند التحديد</div>
+      <div class="hero-cap">SVG حقيقي — كبّره براحتك، الأطراف تبقى ناعمة.<br/>في التطبيق: template → بنفسجي Seen عند التحديد</div>
     </div>
   </div>
 </section>
 
-<section id="opts">
-  <div class="st">الخيارات <span class="tag ok">كلها filled</span></div>
-  <p class="sd">كل الخيارات نفس الشكل الـ vector. الفرق فقط ستايل التحديد.</p>
+<section>
+  <div class="st">الخيارات <span class="tag">كلها filled</span></div>
   <div class="grid" id="options"></div>
 </section>
 
-<section id="bar">
-  <div class="st">على التاب بار <span class="tag">Live</span></div>
+<section>
+  <div class="st">التاب بار</div>
   <div class="compare">
     <div class="card">
-      <div class="st" style="margin-bottom:10px"><span class="tag warn">قبل · عين</span></div>
+      <div class="st"><span class="tag warn">قبل · عين</span></div>
       <div class="phone">
         <div class="status"><span>9:41</span><div class="island"></div><span>▮▮</span></div>
-        <div class="logo"><div class="brand">Seen</div></div>
-        <div class="feed"><div class="frow"><div class="av"></div><div><div class="an">Nora</div><div class="am">rated an episode · 2h</div></div></div></div>
+        <div class="logo">Seen</div>
+        <div class="feed"><div class="frow"><div class="av"></div><div><div style="font-weight:700;font-size:12px">Nora</div><div style="font-size:11px;color:#888">rated · 2h</div></div></div></div>
         <div class="tabbar" id="bar-before"></div>
       </div>
     </div>
     <div class="card">
-      <div class="st" style="margin-bottom:10px"><span class="tag ok" id="after-tag">بعد · A</span></div>
+      <div class="st"><span class="tag" id="after-tag">بعد · A</span></div>
       <div class="phone">
         <div class="status"><span>9:41</span><div class="island"></div><span>▮▮</span></div>
-        <div class="logo"><div class="brand">Seen</div></div>
-        <div class="feed"><div class="frow"><div class="av"></div><div><div class="an">Nora</div><div class="am">rated an episode · 2h</div></div></div></div>
+        <div class="logo">Seen</div>
+        <div class="feed"><div class="frow"><div class="av"></div><div><div style="font-weight:700;font-size:12px">Nora</div><div style="font-size:11px;color:#888">rated · 2h</div></div></div></div>
         <div class="tabbar" id="bar-after"></div>
       </div>
       <p class="note" id="after-note"></p>
@@ -153,51 +131,45 @@ section{margin:0 0 28px}
   </div>
 </section>
 
-<section id="pick">
+<section>
   <div class="st">اختيارك</div>
   <div class="card"><div class="picked" id="pick-summary"></div></div>
 </section>
 </main>
 
-<div class="live">
-  <div class="row">
-    <div>
-      <div class="t" id="live-title">A · Soft House · Purple</div>
-      <div class="s" id="live-sub">filled vector + بنفسجي Seen</div>
-    </div>
-    <div class="mini" id="live-tabs"></div>
-  </div>
-</div>
-<p class="foot">Seen · Home icon — PDF vector في التطبيق</p>
+<div class="live"><div class="row">
+  <div><div class="t" id="live-title">A · Soft House · Purple</div><div class="s" id="live-sub">بيت صورتك + بنفسجي Seen</div></div>
+  <div class="mini" id="live-tabs"></div>
+</div></div>
 
 <script>
-const HOUSE = `<svg class="ico" viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd"><path d="M12 1.2C13.55 1.2 15.3 2.05 17.05 4.05C18.4 5.6 19.1 7.2 19.1 8.85V18.6C19.1 20.35 17.7 21.75 15.95 21.75H8.05C6.3 21.75 4.9 20.35 4.9 18.6V8.85C4.9 7.2 5.6 5.6 6.95 4.05C8.7 2.05 10.45 1.2 12 1.2ZM8.15 21.75V14.55C8.15 12.55 9.85 10.95 12 10.95C14.15 10.95 15.85 12.55 15.85 14.55V21.75H8.15Z"/></svg>`;
-const eye = `<svg class="ico" viewBox="0 0 24 24"><path fill="currentColor" d="M12 5.2c5.2 0 8.9 4.2 9.9 6.1.2.4.2.9 0 1.3-1 1.9-4.7 6.1-9.9 6.1S3.1 14.5 2.1 12.6c-.2-.4-.2-.9 0-1.3C3.1 9.4 6.8 5.2 12 5.2Zm0 2.3A4.5 4.5 0 1 0 12 16.5 4.5 4.5 0 0 0 12 7.5Zm0 2.2a2.3 2.3 0 1 1 0 4.6 2.3 2.3 0 0 1 0-4.6Z"/></svg>`;
-const tv = `<svg class="ico" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" d="M4.5 7.5h15v10h-15zM9 20.5h6M12 17.5v3"/></svg>`;
-const search = `<svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M16.2 16.2 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`;
-const film = `<svg class="ico" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" d="M5 5.5h14v13H5zM9 5.5v13M15 5.5v13M5 9.5h4M15 9.5h4M5 14.5h4M15 14.5h4"/></svg>`;
-const person = `<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="8.2" r="3.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5.5 19.2c1.6-3.2 4-4.8 6.5-4.8s4.9 1.6 6.5 4.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`;
+const HOUSE = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.5C13.2 1.5 16.5 5 19.8 10.2C21.2 11.5 21.3 12.5 21.3 13.5C21.3 16.5 21.3 18 21 19C20.6 21.2 19.2 21.8 17.5 21.8H14.85C14.85 18.5 14.2 15 12 15C9.8 15 9.15 18.5 9.15 21.8H6.5C4.8 21.8 3.4 21.2 3 19C2.7 18 2.7 16.5 2.7 13.5C2.7 12.5 2.8 11.5 4.2 10.2C7.5 5 10.8 1.5 12 1.5Z"/></svg>`;
+const eye = `<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 5.2c5.2 0 8.9 4.2 9.9 6.1.2.4.2.9 0 1.3-1 1.9-4.7 6.1-9.9 6.1S3.1 14.5 2.1 12.6c-.2-.4-.2-.9 0-1.3C3.1 9.4 6.8 5.2 12 5.2Zm0 2.3A4.5 4.5 0 1 0 12 16.5 4.5 4.5 0 0 0 12 7.5Zm0 2.2a2.3 2.3 0 1 1 0 4.6 2.3 2.3 0 0 1 0-4.6Z"/></svg>`;
+const tv = `<svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M4.5 7.5h15v10h-15zM9 20.5h6M12 17.5v3"/></svg>`;
+const search = `<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M16.2 16.2 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`;
+const film = `<svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" d="M5 5.5h14v13H5zM9 5.5v13M15 5.5v13M5 9.5h4M15 9.5h4M5 14.5h4M15 14.5h4"/></svg>`;
+const person = `<svg viewBox="0 0 24 24"><circle cx="12" cy="8.2" r="3.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5.5 19.2c1.6-3.2 4-4.8 6.5-4.8s4.9 1.6 6.5 4.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`;
 
 const opts = [
-  {id:'A', name:'Soft House · Purple', why:'نفس الشكل filled vector + بنفسجي Seen.', accent:'purple', chip:false},
+  {id:'A', name:'Soft House · Purple', why:'بيت صورتك filled + بنفسجي Seen.', accent:'purple', chip:false},
   {id:'B', name:'House داخل Chip', why:'نفس الشكل + مربّع داكن عند التحديد.', accent:'purple', chip:'soft'},
-  {id:'C', name:'House · Purple chip', why:'Chip بنفسجي خفيف حول البيت.', accent:'purple', chip:'purple'},
-  {id:'D', name:'House · Gold', why:'نفس الشكل بذهبي Friends (تجربة).', accent:'gold', chip:false},
+  {id:'C', name:'House · Purple chip', why:'Chip بنفسجي خفيف.', accent:'purple', chip:'purple'},
+  {id:'D', name:'House · Gold', why:'ذهبي Friends (تجربة).', accent:'gold', chip:false},
   {id:'F', name:'Eye (القديم)', why:'للمقارنة فقط.', accent:'purple', chip:false, eye:true},
 ];
 let selected = 'A';
 const others = [{lb:'Shows', ic:tv},{lb:'Explore', ic:search},{lb:'Movies', ic:film},{lb:'Profile', ic:person}];
 
-function homeIcon(opt, on){
-  if (opt.eye) return eye;
+function homeIcon(o, on){
+  if (o.eye) return eye;
   let g = `<span class="glyph">${HOUSE}</span>`;
-  if (on && opt.chip === 'soft') return `<span class="chip">${g}</span>`;
-  if (on && opt.chip === 'purple') return `<span class="chip glow">${g}</span>`;
+  if (on && o.chip === 'soft') return `<span class="chip">${g}</span>`;
+  if (on && o.chip === 'purple') return `<span class="chip glow">${g}</span>`;
   return g;
 }
-function renderBar(el, opt, forceEye){
-  const cls = forceEye ? 'tab on' : ('tab on' + (opt.accent==='gold'?' gold':''));
-  const ic = forceEye ? eye : homeIcon(opt, true);
+function renderBar(el, o, forceEye){
+  const cls = forceEye ? 'tab on' : ('tab on' + (o.accent==='gold'?' gold':''));
+  const ic = forceEye ? eye : homeIcon(o, true);
   el.innerHTML = `<div class="${cls}"><div class="ic">${ic}</div><div class="lb">Home</div></div>` +
     others.map(t => `<div class="tab"><div class="ic">${t.ic}</div><div class="lb">${t.lb}</div></div>`).join('');
 }
@@ -212,21 +184,21 @@ function renderOptions(){
       <div class="wh">${o.why}</div>
     </button>`;
   }).join('');
-  root.querySelectorAll('.opt').forEach(btn => btn.onclick = () => { selected = btn.dataset.id; apply(); });
+  root.querySelectorAll('.opt').forEach(b => b.onclick = () => { selected = b.dataset.id; apply(); });
 }
 function apply(){
-  const opt = opts.find(o => o.id === selected);
+  const o = opts.find(x => x.id === selected);
   renderOptions();
-  renderBar(document.getElementById('bar-before'), opt, true);
-  renderBar(document.getElementById('bar-after'), opt, false);
-  document.getElementById('after-tag').textContent = `بعد · ${opt.id}`;
-  document.getElementById('after-note').textContent = opt.why;
-  document.getElementById('pick-summary').textContent = `اختيارك: ${opt.id} — ${opt.name}. إذا عاجبك قول لي الرقم.`;
-  document.getElementById('live-title').textContent = `${opt.id} · ${opt.name}`;
-  document.getElementById('live-sub').textContent = opt.why;
-  const color = opt.accent==='gold' ? 'on gold' : 'on';
+  renderBar(document.getElementById('bar-before'), o, true);
+  renderBar(document.getElementById('bar-after'), o, false);
+  document.getElementById('after-tag').textContent = `بعد · ${o.id}`;
+  document.getElementById('after-note').textContent = o.why;
+  document.getElementById('pick-summary').textContent = `اختيارك: ${o.id} — ${o.name}. إذا عاجبك قول لي الرقم.`;
+  document.getElementById('live-title').textContent = `${o.id} · ${o.name}`;
+  document.getElementById('live-sub').textContent = o.why;
+  const color = o.accent==='gold' ? 'on gold' : 'on';
   document.getElementById('live-tabs').innerHTML =
-    `<div class="t ${color}">${homeIcon(opt,true)}</div>` +
+    `<div class="t ${color}">${homeIcon(o,true)}</div>` +
     others.map(t => `<div class="t">${t.ic}</div>`).join('');
 }
 renderOptions(); apply();
