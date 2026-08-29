@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>Seen · خيارات زر الهوم</title>
+<style>
+:root{
+  --bg:#050505; --card:#121212; --line:rgba(255,255,255,.1);
+  --muted:#8a8a8a; --purple:#7B2FBE; --purple2:#a855f7; --gold:#f0c73d;
+  --safe:env(safe-area-inset-bottom,16px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Arabic",sans-serif;padding-bottom:calc(100px + var(--safe))}
+.top{position:sticky;top:0;z-index:40;background:rgba(5,5,5,.94);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--line);padding:14px 14px 10px}
+h1{margin:0;font-size:17px;font-weight:800;text-align:center}
+.sub{margin:5px 0 0;text-align:center;font-size:12px;color:#777;line-height:1.45}
+.nav{display:flex;gap:8px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{flex:0 0 auto;text-decoration:none;color:#ccc;font-size:12px;font-weight:700;padding:8px 12px;border-radius:999px;background:#1a1a1a;border:1px solid var(--line)}
+main{padding:16px 14px}
+section{margin:0 0 28px}
+.st{font-size:14px;font-weight:800;margin:0 0 6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tag{font-size:10px;font-weight:800;padding:3px 7px;border-radius:6px;background:rgba(123,47,190,.22);color:var(--purple2)}
+.tag.gold{background:rgba(240,199,61,.16);color:var(--gold)}
+.sd{font-size:12px;color:#888;margin:0 0 12px;line-height:1.55}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+.refs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.refs figure{margin:0;background:#0a0a0a;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.refs img{width:100%;display:block;aspect-ratio:1;object-fit:cover;background:#000}
+.refs figcaption{font-size:11px;color:#888;padding:8px 10px;line-height:1.4}
+.swatches{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.sw{display:flex;align-items:center;gap:6px;font-size:11px;color:#aaa}
+.dot{width:14px;height:14px;border-radius:50%}
+.dot.p{background:var(--purple)}.dot.p2{background:var(--purple2)}.dot.g{background:var(--gold)}.dot.w{background:#eee;border:1px solid #333}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(min-width:640px){.grid{grid-template-columns:1fr 1fr 1fr}}
+.opt{background:#101010;border:1px solid var(--line);border-radius:16px;padding:14px 10px 12px;text-align:center;cursor:pointer;color:inherit;font:inherit;width:100%}
+.opt.sel{border-color:var(--purple2);box-shadow:0 0 0 1px rgba(168,85,247,.35)}
+.opt .pv{height:64px;display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:8px}
+.d{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted)}
+.d.on{color:var(--purple)}.d.on.gold{color:var(--gold)}
+.d span{font-size:9px;color:#666}
+.chip{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:#2a2a2c;color:#fff}
+.chip.glow{background:rgba(123,47,190,.28);box-shadow:0 0 16px rgba(123,47,190,.25)}
+.nm{font-size:13px;font-weight:800}
+.wh{font-size:11px;color:#888;margin-top:5px;line-height:1.4}
+.sf{font-size:10px;color:#666;margin-top:7px;font-family:ui-monospace,Menlo,monospace}
+.compare{display:grid;gap:12px}
+@media(min-width:760px){.compare{grid-template-columns:1fr 1fr}}
+.phone{width:min(100%,340px);margin:0 auto;border-radius:34px;border:2.5px solid #2a2a2a;background:#000;overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.5)}
+.status{height:46px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 20px 8px;font-size:12px;font-weight:700;position:relative}
+.island{position:absolute;left:50%;top:10px;transform:translateX(-50%);width:104px;height:28px;border-radius:16px;background:#1a1a1c}
+.logo{height:40px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:center}
+.brand{font-size:19px;font-weight:900;background:linear-gradient(90deg,var(--purple),var(--purple2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.feed{height:118px;padding:10px 12px 0}
+.frow{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#3a2a55,#1a1020);flex:0 0 auto}
+.an{font-size:12.5px;font-weight:700}.am{font-size:11px;color:var(--muted);margin-top:1px}
+.tabbar{display:flex;height:56px;padding-top:8px;border-top:.5px solid var(--line);background:rgba(18,18,18,.96)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;color:var(--muted)}
+.tab.on{color:var(--purple)}.tab.on.gold{color:var(--gold)}
+.tab .ic{width:28px;height:28px;display:grid;place-items:center}
+.tab .lb{font-size:9.5px;font-weight:600}.tab.on .lb{font-weight:750}
+svg.ico{width:24px;height:24px;display:block}
+.note{font-size:11px;color:#777;text-align:center;margin-top:8px;line-height:1.45}
+.picked{padding:10px 12px;border-radius:12px;background:rgba(123,47,190,.12);border:1px solid rgba(168,85,247,.25);font-size:12px;color:#ddd;line-height:1.5}
+.live{position:fixed;left:12px;right:12px;bottom:calc(10px + var(--safe));z-index:50;background:rgba(18,18,18,.96);border:1px solid var(--line);border-radius:18px;padding:10px 12px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.live .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.live .t{font-size:12px;font-weight:800}.live .s{font-size:11px;color:#888}
+.mini{display:flex;gap:2px;background:#0c0c0c;border-radius:14px;padding:6px 4px;border:1px solid var(--line);min-width:180px}
+.mini .t{flex:1;display:grid;place-items:center;color:#666;padding:4px 0}
+.mini .t.on{color:var(--purple)}.mini .t.on.gold{color:var(--gold)}
+.mini svg.ico{width:18px;height:18px}
+.foot{margin:8px 14px 0;text-align:center;font-size:11px;color:#555;line-height:1.5}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>زر الهوم · خيارات بهوية Seen</h1>
+  <p class="sub">من الصورة اللي أرسلتها — بيت soft بزوايا مدوّرة + باب<br/>اختَر اللي يعجبك وأطبّقه على التاب بار</p>
+  <nav class="nav">
+    <a href="#ref">المرجع</a>
+    <a href="#opts">الخيارات</a>
+    <a href="#bar">على التاب بار</a>
+    <a href="#pick">اختيارك</a>
+  </nav>
+</header>
+
+<main>
+<section id="ref">
+  <div class="st">المرجع منك <span class="tag">Home</span></div>
+  <p class="sd">البيت soft / bubbly مع فتحة الباب — أوضح كـ Home من العين الحالية، ونقدر نلوّنه بهوية Seen.</p>
+  <div class="card">
+    <div class="refs">
+      <figure>
+        <img alt="مرجع البيت" src="data:image/jpeg;base64,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"/>
+        <figcaption>الشكل الأساسي — filled soft house</figcaption>
+      </figure>
+      <figure>
+        <img alt="مرجع داخل زر" src="data:image/jpeg;base64,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"/>
+        <figcaption>داخل زر داكن (selected chip)</figcaption>
+      </figure>
+    </div>
+    <div class="swatches">
+      <div class="sw"><span class="dot p"></span>seenPurple</div>
+      <div class="sw"><span class="dot p2"></span>accent</div>
+      <div class="sw"><span class="dot g"></span>Friends gold</div>
+      <div class="sw"><span class="dot w"></span>أيقونة template</div>
+    </div>
+  </div>
+</section>
+
+<section id="opts">
+  <div class="st">الخيارات <span class="tag">6</span></div>
+  <p class="sd">اضغط خيار عشان تشوفه على التاب بار. الرمادي = غير محدّد، البنفسجي/الذهبي = محدّد.</p>
+  <div class="grid" id="options"></div>
+</section>
+
+<section id="bar">
+  <div class="st">معاينة التاب بار <span class="tag">Live</span></div>
+  <p class="sd">ترتيب Seen: Home · Shows · Explore · Movies · Profile</p>
+  <div class="compare">
+    <div class="card">
+      <div class="st" style="margin-bottom:10px"><span class="tag">قبل · عين</span></div>
+      <div class="phone">
+        <div class="status"><span>9:41</span><div class="island"></div><span>▮▮</span></div>
+        <div class="logo"><div class="brand">Seen</div></div>
+        <div class="feed">
+          <div class="frow"><div class="av"></div><div><div class="an">Nora</div><div class="am">rated an episode · 2h</div></div></div>
+          <div class="frow"><div class="av"></div><div><div class="an">Omar</div><div class="am">finished a movie · 5h</div></div></div>
+        </div>
+        <div class="tabbar" id="bar-before"></div>
+      </div>
+      <p class="note">الحالي: eye / eye.fill بلون Seen purple</p>
+    </div>
+    <div class="card">
+      <div class="st" style="margin-bottom:10px"><span class="tag" id="after-tag">بعد · خيارك</span></div>
+      <div class="phone">
+        <div class="status"><span>9:41</span><div class="island"></div><span>▮▮</span></div>
+        <div class="logo"><div class="brand">Seen</div></div>
+        <div class="feed">
+          <div class="frow"><div class="av"></div><div><div class="an">Nora</div><div class="am">rated an episode · 2h</div></div></div>
+          <div class="frow"><div class="av"></div><div><div class="an">Omar</div><div class="am">finished a movie · 5h</div></div></div>
+        </div>
+        <div class="tabbar" id="bar-after"></div>
+      </div>
+      <p class="note" id="after-note">اختَر خيار من فوق</p>
+    </div>
+  </div>
+</section>
+
+<section id="pick">
+  <div class="st">اختيارك <span class="tag gold">Vote</span></div>
+  <div class="card">
+    <p class="sd" style="margin:0 0 8px">قلّي رقم الخيار (A–F) اللي عاجبك — أو أكثر من واحد إذا تبي مقارنة أدق — وأطبّقه في التطبيق.</p>
+    <div class="picked" id="pick-summary">ما اخترت بعد — اضغط أي خيار فوق.</div>
+  </div>
+</section>
+</main>
+
+<div class="live">
+  <div class="row">
+    <div>
+      <div class="t" id="live-title">الخيار المحدّد: —</div>
+      <div class="s" id="live-sub">اضغط خيار عشان تشوفه هنا</div>
+    </div>
+    <div class="mini" id="live-tabs"></div>
+  </div>
+</div>
+<p class="foot">Seen · Home icon sketches</p>
+
+<script>
+const homeFilled = `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M11.52 3.2a.95.95 0 0 1 1.0 0l7.25 5.05a.95.95 0 0 1-.55 1.72h-.5v8.55c0 1.4-1.15 2.53-2.55 2.53h-2.15a.95.95 0 0 1-.95-.95v-4.2c0-.95-.77-1.72-1.72-1.72h-1.0c-.95 0-1.72.77-1.72 1.72v4.2c0 .52-.43.95-.95.95H7.8c-1.4 0-2.55-1.13-2.55-2.53V9.97h-.5a.95.95 0 0 1-.55-1.72L11.52 3.2Zm.5 1.78L6.45 9.55v8.97c0 .25.2.45.45.45h1.7v-3.75c0-1.55 1.25-2.8 2.8-2.8h1.0c1.55 0 2.8 1.25 2.8 2.8v3.75h1.7c.25 0 .45-.2.45-.45V9.55l-5.57-4.57Z"/></svg>`;
+const homeOutline = `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.85" stroke-linejoin="round" stroke-linecap="round" d="M4.7 10.3 12 4.9l7.3 5.4v8.3c0 1-.8 1.8-1.8 1.8h-2.3v-4c0-1-.8-1.8-1.8-1.8h-2.8c-1 0-1.8.8-1.8 1.8v4H6.5c-1 0-1.8-.8-1.8-1.8v-8.3Z"/></svg>`;
+const eyeOutline = `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" d="M2.7 12s3.4-6.2 9.3-6.2S21.3 12 21.3 12s-3.4 6.2-9.3 6.2S2.7 12 2.7 12Z"/><circle cx="12" cy="12" r="2.6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>`;
+const eyeFilled = `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 5.2c5.2 0 8.9 4.2 9.9 6.1.2.4.2.9 0 1.3-1 1.9-4.7 6.1-9.9 6.1S3.1 14.5 2.1 12.6c-.2-.4-.2-.9 0-1.3C3.1 9.4 6.8 5.2 12 5.2Zm0 2.3A4.5 4.5 0 1 0 12 16.5 4.5 4.5 0 0 0 12 7.5Zm0 2.2a2.3 2.3 0 1 1 0 4.6 2.3 2.3 0 0 1 0-4.6Z"/></svg>`;
+const tv = `<svg class="ico" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" d="M4.5 7.5h15v10h-15zM9 20.5h6M12 17.5v3"/></svg>`;
+const search = `<svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M16.2 16.2 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`;
+const film = `<svg class="ico" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" d="M5 5.5h14v13H5zM9 5.5v13M15 5.5v13M5 9.5h4M15 9.5h4M5 14.5h4M15 14.5h4"/></svg>`;
+const person = `<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="8.2" r="3.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5.5 19.2c1.6-3.2 4-4.8 6.5-4.8s4.9 1.6 6.5 4.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`;
+
+const opts = [
+  {id:'A', name:'Soft House · Purple', why:'نفس شكل صورتك، والتحديد بنفسجي Seen.', sf:'template + seenPurple', accent:'purple', chip:false, iconOff:homeFilled, iconOn:homeFilled},
+  {id:'B', name:'House داخل Chip', why:'مثل صورتك الثانية: البيت داخل مربّع داكن عند التحديد.', sf:'selected dark squircle', accent:'purple', chip:'soft', iconOff:homeFilled, iconOn:homeFilled},
+  {id:'C', name:'House · Purple chip', why:'Chip بنفسجي خفيف + أيقونة بيضاء — حضور أقوى لـ Home.', sf:'chip seenPurple 28%', accent:'purple', chip:'purple', iconOff:homeFilled, iconOn:homeFilled},
+  {id:'D', name:'House · Gold selected', why:'تجربة بـ Friends gold (مو الأنسب للهوم، بس للمعاينة).', sf:'tint friendsGold', accent:'gold', chip:false, iconOff:homeFilled, iconOn:homeFilled},
+  {id:'E', name:'Outline → Fill', why:'غير محدّد: حدود، محدّد: filled soft — إحساس iOS.', sf:'outline / filled', accent:'purple', chip:false, iconOff:homeOutline, iconOn:homeFilled},
+  {id:'F', name:'يبقى Eye (الحالي)', why:'للمقارنة فقط — العين أقرب لبراند Seen، البيت أوضح كـ Home.', sf:'eye / eye.fill', accent:'purple', chip:false, iconOff:eyeOutline, iconOn:eyeFilled}
+];
+
+let selected = 'A';
+const others = [{lb:'Shows', ic:tv},{lb:'Explore', ic:search},{lb:'Movies', ic:film},{lb:'Profile', ic:person}];
+
+function wrapIcon(opt, on){
+  let ic = on ? opt.iconOn : opt.iconOff;
+  if (on && opt.chip === 'soft') ic = `<span class="chip">${ic}</span>`;
+  if (on && opt.chip === 'purple') ic = `<span class="chip glow">${ic}</span>`;
+  return ic;
+}
+
+function renderBar(el, opt, forceEye){
+  const homeCls = forceEye ? 'tab on' : ('tab on' + (opt.accent==='gold' ? ' gold' : ''));
+  const homeIc = forceEye ? eyeFilled : wrapIcon(opt, true);
+  el.innerHTML =
+    `<div class="${homeCls}"><div class="ic">${homeIc}</div><div class="lb">Home</div></div>` +
+    others.map(t => `<div class="tab"><div class="ic">${t.ic}</div><div class="lb">${t.lb}</div></div>`).join('');
+}
+
+function renderOptions(){
+  const root = document.getElementById('options');
+  root.innerHTML = opts.map(o => {
+    const off = `<div class="d">${o.iconOff}<span>off</span></div>`;
+    const onCls = 'd on' + (o.accent==='gold' ? ' gold' : '');
+    const on = `<div class="${onCls}">${wrapIcon(o,true)}<span>on</span></div>`;
+    return `<button class="opt ${selected===o.id?'sel':''}" data-id="${o.id}" type="button">
+      <div class="pv">${off}${on}</div>
+      <div class="nm">${o.id} · ${o.name}</div>
+      <div class="wh">${o.why}</div>
+      <div class="sf">${o.sf}</div>
+    </button>`;
+  }).join('');
+  root.querySelectorAll('.opt').forEach(btn => {
+    btn.onclick = () => { selected = btn.dataset.id; apply(); };
+  });
+}
+
+function apply(){
+  const opt = opts.find(o => o.id === selected);
+  renderOptions();
+  renderBar(document.getElementById('bar-before'), opt, true);
+  renderBar(document.getElementById('bar-after'), opt, false);
+  document.getElementById('after-tag').textContent = `بعد · ${opt.id} ${opt.name}`;
+  document.getElementById('after-note').textContent = opt.why;
+  document.getElementById('pick-summary').textContent =
+    `اختيارك الحالي: ${opt.id} — ${opt.name}. إذا عاجبك اكتب لي الرقم وأطبّقه في التطبيق.`;
+  document.getElementById('live-title').textContent = `الخيار المحدّد: ${opt.id}`;
+  document.getElementById('live-sub').textContent = opt.name;
+  const color = opt.accent==='gold' ? 'on gold' : 'on';
+  document.getElementById('live-tabs').innerHTML =
+    `<div class="t ${color}">${wrapIcon(opt,true)}</div>` +
+    others.map(t => `<div class="t">${t.ic}</div>`).join('');
+}
+
+renderOptions();
+apply();
+</script>
+</body>
+</html>
