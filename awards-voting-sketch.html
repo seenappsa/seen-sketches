@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Seen · Awards Voting Sketch</title>
+<style>
+  :root {
+    --bg: #000;
+    --card: #141414;
+    --card2: #1c1c1c;
+    --text: #fff;
+    --muted: #9a9a9a;
+    --line: #2a2a2a;
+    --accent: #7B2FBE;
+    --ok: #2ECC71;
+    --warn: #F5A623;
+    --pill: #fff;
+    --radius: 16px;
+    --safe-b: env(safe-area-inset-bottom, 12px);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0; background: #0a0a0a; color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  }
+  body { min-height: 100dvh; }
+  .wrap {
+    max-width: 430px; margin: 0 auto; min-height: 100dvh;
+    background: var(--bg); position: relative; padding-bottom: 96px;
+  }
+  .topnote {
+    position: sticky; top: 0; z-index: 50;
+    background: #111; border-bottom: 1px solid var(--line);
+    padding: 10px 14px 12px; font-size: 12px; color: #ddd;
+  }
+  .topnote strong { color: #fff; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .chip {
+    border: 1px solid #333; background: #1a1a1a; color: #eee;
+    border-radius: 999px; padding: 7px 12px; font-size: 12px; font-weight: 600;
+  }
+  .chip.on { background: var(--accent); border-color: var(--accent); }
+  .phone {
+    padding: 8px 0 0;
+  }
+  .status {
+    display: flex; justify-content: space-between; padding: 6px 18px 2px;
+    font-size: 12px; font-weight: 600; opacity: .9;
+  }
+  .hdr {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 16px 10px;
+  }
+  .hdr h1 { margin: 0; font-size: 34px; letter-spacing: -0.5px; }
+  .back {
+    width: 36px; height: 36px; border-radius: 18px; border: 0;
+    background: #1a1a1a; color: #fff; font-size: 18px;
+  }
+  .title-center {
+    flex: 1; text-align: center; font-size: 16px; font-weight: 700;
+  }
+  .screen { display: none; }
+  .screen.on { display: block; }
+
+  /* Explore */
+  .banner {
+    margin: 4px 16px 18px; border-radius: 18px; overflow: hidden;
+    position: relative; height: 168px; border: 0; width: calc(100% - 32px);
+    padding: 0; text-align: start; color: #fff; cursor: pointer;
+  }
+  .banner .bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 20% 40%, rgba(255,180,60,.35), transparent 40%),
+      radial-gradient(circle at 70% 30%, rgba(255,80,40,.28), transparent 45%),
+      linear-gradient(160deg, #2a1208, #0a0503 60%, #1a0a05);
+  }
+  .banner .fade {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,.85) 0%, rgba(0,0,0,.15) 55%, rgba(0,0,0,.2) 100%);
+  }
+  .banner .copy {
+    position: absolute; left: 16px; right: 16px; bottom: 14px; text-align: left;
+    direction: ltr;
+  }
+  .banner .copy h2 { margin: 0; font-size: 28px; font-weight: 800; }
+  .banner .copy p { margin: 4px 0 0; font-size: 13px; color: #ddd; }
+  .banner.locked .bg { filter: grayscale(1) brightness(.55); }
+  .banner.locked .copy h2 { color: #bbb; }
+  .lock-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 8px; background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 999px; padding: 5px 10px; font-size: 11px; font-weight: 700;
+  }
+  .section { margin: 0 0 18px; }
+  .section h3 {
+    margin: 0 16px 10px; font-size: 18px; font-weight: 800; text-align: left; direction: ltr;
+  }
+  .row {
+    display: flex; gap: 12px; overflow-x: auto; padding: 0 16px 4px;
+    scrollbar-width: none;
+  }
+  .row::-webkit-scrollbar { display: none; }
+  .poster {
+    flex: 0 0 108px; width: 108px;
+  }
+  .poster .img {
+    width: 108px; height: 160px; border-radius: 12px;
+    background: linear-gradient(145deg, #333, #111);
+    border: 2px solid transparent;
+  }
+  .poster .t { margin-top: 6px; font-size: 13px; font-weight: 600; text-align: left; direction: ltr; }
+  .poster .s { font-size: 12px; color: var(--muted); text-align: left; direction: ltr; }
+
+  .search {
+    position: fixed; left: 50%; transform: translateX(-50%);
+    bottom: calc(14px + var(--safe-b)); width: min(400px, calc(100% - 28px));
+    background: rgba(28,28,30,.92); backdrop-filter: blur(16px);
+    border: 1px solid #333; border-radius: 18px;
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px; color: #aaa; font-size: 15px; z-index: 40;
+  }
+
+  /* Hub / ballot */
+  .progress-card {
+    margin: 8px 16px 18px; background: #1a1a1a; border-radius: 18px;
+    padding: 18px 16px 14px; text-align: left; direction: ltr;
+  }
+  .progress-card h2 { margin: 0; font-size: 28px; font-weight: 800; }
+  .progress-card .sub { margin: 6px 0 14px; color: var(--muted); font-size: 14px; }
+  .btn {
+    width: 100%; border: 0; border-radius: 999px; padding: 14px 16px;
+    font-size: 16px; font-weight: 800; cursor: pointer;
+  }
+  .btn.primary { background: #fff; color: #000; }
+  .btn.ghost { background: #2a2a2a; color: #fff; margin-top: 8px; }
+  .btn:disabled { opacity: .45; }
+
+  .cat { margin: 0 0 22px; }
+  .cat h3 {
+    margin: 0 16px 12px; font-size: 22px; font-weight: 800;
+    text-align: left; direction: ltr;
+  }
+  .nominee {
+    flex: 0 0 120px; width: 120px; background: transparent; border: 0;
+    padding: 0; color: #fff; text-align: left; direction: ltr; cursor: pointer;
+  }
+  .nominee .img {
+    width: 120px; height: 178px; border-radius: 14px;
+    background: linear-gradient(160deg, #444, #151515);
+    border: 3px solid transparent; position: relative; overflow: hidden;
+  }
+  .nominee.picked .img {
+    border-color: #ff6a3d;
+    box-shadow: 0 0 0 1px rgba(255,106,61,.35), 0 0 18px rgba(255,106,61,.35);
+  }
+  .nominee .img::after {
+    content: attr(data-label);
+    position: absolute; inset: 0; display: grid; place-items: center;
+    font-weight: 800; font-size: 18px; color: rgba(255,255,255,.75);
+    background:
+      radial-gradient(circle at 30% 25%, rgba(255,255,255,.12), transparent 40%),
+      linear-gradient(160deg, #3a3a3a, #121212);
+  }
+  .nominee .t { margin-top: 8px; font-size: 14px; font-weight: 700; line-height: 1.2; }
+  .nominee .s { margin-top: 3px; font-size: 13px; color: var(--muted); }
+  .nominee .pct { margin-top: 3px; font-size: 13px; color: #bdbdbd; font-weight: 600; }
+  .bar {
+    margin-top: 6px; height: 4px; border-radius: 99px; background: #2a2a2a; overflow: hidden;
+  }
+  .bar > i { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
+
+  .answer {
+    margin: 18px 16px 28px; padding: 14px; border-radius: 16px;
+    background: #121212; border: 1px solid #262626; text-align: right;
+    font-size: 13.5px; line-height: 1.55; color: #ddd;
+  }
+  .answer h4 { margin: 0 0 8px; color: #fff; font-size: 15px; }
+  .answer ul { margin: 0; padding-right: 18px; }
+  .answer li { margin: 6px 0; }
+  .muted { color: var(--muted); }
+  .toast {
+    position: fixed; left: 50%; transform: translateX(-50%) translateY(20px);
+    bottom: calc(78px + var(--safe-b)); background: #fff; color: #000;
+    padding: 10px 14px; border-radius: 999px; font-size: 13px; font-weight: 700;
+    opacity: 0; pointer-events: none; transition: .25s ease; z-index: 60;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topnote">
+      <strong>سكيتش تصويت الجوائز · Seen</strong><br />
+      بدّل الحالات تحت وجرّب التدفق كامل على الجوال.
+      <div class="chips" id="stateChips">
+        <button class="chip on" data-state="locked">مقفل (رمادي)</button>
+        <button class="chip" data-state="open">مفتوح للتصويت</button>
+        <button class="chip" data-state="results">نتائج بعد التصويت</button>
+      </div>
+    </div>
+
+    <!-- EXPLORE -->
+    <section class="screen on" id="explore">
+      <div class="phone">
+        <div class="status"><span>10:11</span><span>Seen · Explore</span></div>
+        <div class="hdr"><h1>Explore</h1></div>
+
+        <button class="banner locked" id="awardsBanner" type="button">
+          <div class="bg"></div>
+          <div class="fade"></div>
+          <div class="copy">
+            <h2>78th Emmys</h2>
+            <p id="bannerSub">يفتح خلال أسبوعين · 19 فئة</p>
+            <div class="lock-pill" id="lockPill">🔒 مقفل حتى 31 أغسطس</div>
+          </div>
+        </button>
+
+        <div class="section">
+          <h3>Shows friends watched</h3>
+          <div class="row">
+            <div class="poster"><div class="img"></div><div class="t">Silo</div><div class="s">2023</div></div>
+            <div class="poster"><div class="img"></div><div class="t">The Bear</div><div class="s">2022</div></div>
+            <div class="poster"><div class="img"></div><div class="t">The Pitt</div><div class="s">2025</div></div>
+          </div>
+        </div>
+        <div class="section">
+          <h3>Trending Shows</h3>
+          <div class="row">
+            <div class="poster"><div class="img"></div><div class="t">PLUR1BUS</div><div class="s">2026</div></div>
+            <div class="poster"><div class="img"></div><div class="t">Hacks</div><div class="s">2021</div></div>
+            <div class="poster"><div class="img"></div><div class="t">Shrinking</div><div class="s">2023</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="search">⌕ Search titles and people</div>
+    </section>
+
+    <!-- HUB -->
+    <section class="screen" id="hub">
+      <div class="phone">
+        <div class="status"><span>10:11</span><span>Ballot</span></div>
+        <div class="hdr">
+          <button class="back" id="backExplore" type="button">‹</button>
+          <div class="title-center">78th Emmys</div>
+          <div style="width:36px"></div>
+        </div>
+
+        <div class="progress-card">
+          <h2 id="pickedLabel">0 of 19 picked</h2>
+          <div class="sub" id="deadlineLabel">Voting closes Sep 15, 2026.</div>
+          <button class="btn primary" id="continueBtn" type="button">Start voting</button>
+          <button class="btn ghost" id="seeResultsBtn" type="button" hidden>See community results</button>
+        </div>
+
+        <div class="cat">
+          <h3>Outstanding Comedy Series</h3>
+          <div class="row" id="previewComedy"></div>
+        </div>
+        <div class="cat">
+          <h3>Outstanding Drama Series</h3>
+          <div class="row" id="previewDrama"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BALLOT -->
+    <section class="screen" id="ballot">
+      <div class="phone">
+        <div class="status"><span>10:11</span><span>Vote</span></div>
+        <div class="hdr">
+          <button class="back" id="backHub" type="button">‹</button>
+          <div class="title-center">78th Emmys ballot</div>
+          <div style="width:36px"></div>
+        </div>
+        <div id="ballotCats"></div>
+        <div class="answer">
+          <h4>اقتراح النتائج (Seen)</h4>
+          <ul>
+            <li>بعد ما تختار في فئة: يظهر % لكل مرشح + حدّك ببوردر ملوّن.</li>
+            <li>فوق الصفحة: عدد المصوّتين الكلي (مثلاً <strong>12.4K voters</strong>).</li>
+            <li>قبل ما تصوّت في الفئة: النسب <strong>مخفية</strong> عشان ما يتأثر التصويت.</li>
+            <li>بعد إغلاق الحفل: الوضع يصير نتائج فقط (بدون تغيير التصويت).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <div class="answer" style="margin-top:0">
+      <h4>وين مكانها؟</h4>
+      <ul>
+        <li><strong>أفضل مكان: تاب Explore</strong> — بانر أعلى الصفحة (مثل الصورة)، مو تاب جديد.</li>
+        <li>اختياري: شارة صغيرة في Home وقت الموسم فقط.</li>
+        <li>ما أنصح بتاب ثابت طول السنة — الموسم قصير.</li>
+      </ul>
+      <h4>القفل الرمادي؟</h4>
+      <ul>
+        <li>نعم: البانر يظهر مبكراً <span class="muted">(تيزر)</span> لكن رمادي/مقفل.</li>
+        <li>يفتح قبل الحفل بـ <strong>1–2 أسبوع</strong> (مثلاً nominations drop أو نافذة تصويت رسمية).</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+const TOTAL_VOTERS = 12480;
+const categories = [
+  {
+    id: 'comedy',
+    title: 'Outstanding Comedy Series',
+    nominees: [
+      { id: 'wb', title: "Widow's Bay", year: '2025', votes: 5740 },
+      { id: 'bear', title: 'The Bear', year: '2022', votes: 1997 },
+      { id: 'shr', title: 'Shrinking', year: '2023', votes: 1498 },
+      { id: 'hacks', title: 'Hacks', year: '2021', votes: 1372 },
+      { id: 'abbott', title: 'Abbott Elementary', year: '2021', votes: 1873 },
+    ],
+  },
+  {
+    id: 'drama',
+    title: 'Outstanding Drama Series',
+    nominees: [
+      { id: 'plur', title: 'PLUR1BUS', year: '2026', votes: 4867 },
+      { id: 'knight', title: 'A Knight of the Seven Kingdoms', year: '2026', votes: 3369 },
+      { id: 'pitt', title: 'The Pitt', year: '2025', votes: 1997 },
+      { id: 'diplomat', title: 'The Diplomat', year: '2023', votes: 1248 },
+      { id: 'gilded', title: 'The Gilded Age', year: '2022', votes: 999 },
+    ],
+  },
+  {
+    id: 'limited',
+    title: 'Outstanding Limited or Anthology Series',
+    nominees: [
+      { id: 'adolescence', title: 'Adolescence', year: '2025', votes: 4120 },
+      { id: 'dying', title: "Dying for Sex", year: '2025', votes: 2880 },
+      { id: 'monster', title: 'Monster', year: '2024', votes: 2560 },
+      { id: 'saynothing', title: 'Say Nothing', year: '2024', votes: 2920 },
+    ],
+  },
+];
+
+// Fill remaining fake categories count for "19"
+const TOTAL_CATS = 19;
+
+const state = {
+  mode: 'locked', // locked | open | results
+  picks: {},
+  screen: 'explore',
+};
+
+const $ = (id) => document.getElementById(id);
+const toast = (msg) => {
+  const el = $('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove('show'), 1600);
+};
+
+function pct(votes, list) {
+  const sum = list.reduce((a, n) => a + n.votes, 0) || 1;
+  return Math.round((votes / sum) * 100);
+}
+
+function showScreen(name) {
+  state.screen = name;
+  ['explore', 'hub', 'ballot'].forEach((id) => {
+    $(id).classList.toggle('on', id === name);
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function setMode(mode) {
+  state.mode = mode;
+  document.querySelectorAll('#stateChips .chip').forEach((c) => {
+    c.classList.toggle('on', c.dataset.state === mode);
+  });
+
+  const banner = $('awardsBanner');
+  const lockPill = $('lockPill');
+  const bannerSub = $('bannerSub');
+
+  if (mode === 'locked') {
+    banner.classList.add('locked');
+    lockPill.hidden = false;
+    lockPill.textContent = '🔒 مقفل حتى 31 أغسطس';
+    bannerSub.textContent = 'يفتح خلال أسبوعين · 19 فئة';
+    state.picks = {};
+  } else if (mode === 'open') {
+    banner.classList.remove('locked');
+    lockPill.hidden = true;
+    bannerSub.textContent = '19 categories · Monday, September 14';
+  } else {
+    banner.classList.remove('locked');
+    lockPill.hidden = true;
+    bannerSub.textContent = 'Results live · 12.4K voters';
+    // seed some picks so results look filled
+    if (!Object.keys(state.picks).length) {
+      state.picks = { comedy: 'wb', drama: 'plur', limited: 'adolescence' };
+    }
+  }
+  renderAll();
+  showScreen('explore');
+}
+
+function pickedCount() {
+  return Object.keys(state.picks).length;
+}
+
+function renderPreview(rowId, cat) {
+  const row = $(rowId);
+  row.innerHTML = '';
+  cat.nominees.slice(0, 4).forEach((n) => {
+    const d = document.createElement('div');
+    d.className = 'poster';
+    d.innerHTML = `<div class="img"></div><div class="t">${n.title}</div><div class="s">${n.year}</div>`;
+    // tint poster via label hack
+    d.querySelector('.img').style.background =
+      `linear-gradient(160deg, hsl(${(n.title.length * 37) % 360} 28% 32%), #111)`;
+    row.appendChild(d);
+  });
+}
+
+function renderHub() {
+  const count = pickedCount();
+  const shown = Math.min(count, TOTAL_CATS);
+  $('pickedLabel').textContent = `${shown} of ${TOTAL_CATS} picked`;
+  $('deadlineLabel').textContent =
+    state.mode === 'results'
+      ? `${TOTAL_VOTERS.toLocaleString()} community voters · closed Sep 15`
+      : 'Voting closes Sep 15, 2026.';
+
+  const btn = $('continueBtn');
+  const resultsBtn = $('seeResultsBtn');
+  if (state.mode === 'locked') {
+    btn.textContent = 'Opens in 2 weeks';
+    btn.disabled = true;
+    resultsBtn.hidden = true;
+  } else if (state.mode === 'open') {
+    btn.disabled = false;
+    btn.textContent = count ? 'Continue voting' : 'Start voting';
+    resultsBtn.hidden = count === 0;
+    resultsBtn.textContent = 'See live percentages (after you vote)';
+  } else {
+    btn.disabled = false;
+    btn.textContent = 'View full results';
+    resultsBtn.hidden = false;
+    resultsBtn.textContent = `${TOTAL_VOTERS.toLocaleString()} voters · share ballot`;
+  }
+  renderPreview('previewComedy', categories[0]);
+  renderPreview('previewDrama', categories[1]);
+}
+
+function renderBallot() {
+  const root = $('ballotCats');
+  root.innerHTML = '';
+
+  const summary = document.createElement('div');
+  summary.className = 'progress-card';
+  summary.innerHTML = `
+    <h2 style="font-size:22px">${pickedCount()} of ${TOTAL_CATS} picked</h2>
+    <div class="sub">${
+      state.mode === 'results' || pickedCount()
+        ? `${TOTAL_VOTERS.toLocaleString()} voters in Seen community`
+        : 'Pick one nominee per category. Percentages unlock after you vote.'
+    }</div>
+  `;
+  root.appendChild(summary);
+
+  categories.forEach((cat) => {
+    const section = document.createElement('div');
+    section.className = 'cat';
+    section.innerHTML = `<h3>${cat.title}</h3>`;
+    const row = document.createElement('div');
+    row.className = 'row';
+
+    const myPick = state.picks[cat.id];
+    const showResults = state.mode === 'results' || !!myPick;
+
+    cat.nominees.forEach((n) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'nominee' + (myPick === n.id ? ' picked' : '');
+      const p = pct(n.votes, cat.nominees);
+      b.innerHTML = `
+        <div class="img" data-label="${n.title.split(' ').slice(0,2).join(' ')}"></div>
+        <div class="t">${n.title}</div>
+        <div class="s">${n.year}</div>
+        ${
+          showResults
+            ? `<div class="pct">${p}% · ${n.votes.toLocaleString()} votes</div>
+               <div class="bar"><i style="width:${p}%"></i></div>`
+            : `<div class="pct muted">Vote to reveal</div>`
+        }
+      `;
+      b.querySelector('.img').style.setProperty(
+        'background',
+        `linear-gradient(160deg, hsl(${(n.id.length * 53) % 360} 35% 34%), #0d0d0d)`
+      );
+      b.addEventListener('click', () => {
+        if (state.mode === 'locked') {
+          toast('لسه مقفل — يفتح قبل الحفل بأسبوعين');
+          return;
+        }
+        if (state.mode === 'results') {
+          toast('التصويت مقفل — عرض نتائج فقط');
+          return;
+        }
+        state.picks[cat.id] = n.id;
+        toast(`تم اختيار ${n.title}`);
+        renderAll();
+      });
+      row.appendChild(b);
+    });
+    section.appendChild(row);
+    root.appendChild(section);
+  });
+}
+
+function renderAll() {
+  renderHub();
+  renderBallot();
+}
+
+// events
+document.querySelectorAll('#stateChips .chip').forEach((c) => {
+  c.addEventListener('click', () => setMode(c.dataset.state));
+});
+
+$('awardsBanner').addEventListener('click', () => {
+  if (state.mode === 'locked') {
+    toast('رمادي/مقفل — يفتح قبل الحفل بـ 1–2 أسبوع');
+    return;
+  }
+  showScreen('hub');
+});
+
+$('backExplore').addEventListener('click', () => showScreen('explore'));
+$('backHub').addEventListener('click', () => showScreen('hub'));
+$('continueBtn').addEventListener('click', () => {
+  if (state.mode === 'locked') return;
+  showScreen('ballot');
+});
+$('seeResultsBtn').addEventListener('click', () => {
+  if (state.mode === 'open' && !pickedCount()) return;
+  if (state.mode === 'open') setMode('results');
+  showScreen('ballot');
+});
+
+setMode('locked');
+</script>
+</body>
+</html>
