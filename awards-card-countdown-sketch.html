@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Seen — Awards cards (expected layout)</title>
+  <style>
+    :root {
+      --bg: #000;
+      --text: #fff;
+      --muted: #8a8a8a;
+      --card: #fff;
+      --pill: rgba(0,0,0,.72);
+      --green: #2ec064;
+      --line: #222;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 20px 16px 48px;
+    }
+    h1 {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0 0 6px;
+      text-align: left;
+      direction: ltr;
+    }
+    .sub {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 22px;
+      text-align: left;
+      direction: ltr;
+      line-height: 1.45;
+    }
+    .rules {
+      direction: ltr;
+      text-align: left;
+      background: #111;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 28px;
+      font-size: 13px;
+      line-height: 1.55;
+      color: #ddd;
+    }
+    .rules strong { color: #fff; }
+    .rules li { margin: 6px 0; }
+    .section-label {
+      direction: ltr;
+      text-align: left;
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0 0 12px;
+      font-weight: 700;
+    }
+    .rail {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      direction: ltr;
+    }
+    .award {
+      flex: 0 0 auto;
+      width: 168px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .card {
+      position: relative;
+      width: 168px;
+      background: var(--card);
+      border-radius: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 16px 8px;
+    }
+    .card.has-date { min-height: 114px; padding-bottom: 8px; }
+    .card.no-date { min-height: 100px; padding-bottom: 14px; }
+
+    .logo {
+      width: 136px;
+      height: 72px;
+      border-radius: 4px;
+      background: #111;
+      color: #f5c542;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 900;
+      font-size: 15px;
+      letter-spacing: .02em;
+      line-height: 1.15;
+      flex-shrink: 0;
+    }
+    .logo.emmys { color: #fff; font-size: 18px; letter-spacing: .12em; }
+    .logo.bafta { color: #fff; font-size: 11px; }
+    .logo.cannes { color: #fff; font-size: 22px; }
+
+    .date {
+      margin-top: 4px;
+      font-size: 7px;
+      font-weight: 700;
+      color: #404040;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .countdown {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background: var(--pill);
+      color: #fff;
+      font-size: 7px;
+      font-weight: 700;
+      padding: 2px 5px;
+      border-radius: 999px;
+      line-height: 1.2;
+      z-index: 2;
+    }
+    .countdown.today { color: var(--green); }
+
+    .years {
+      font-size: 11px;
+      font-weight: 600;
+      color: #8c8c8c;
+    }
+
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 32px;
+      direction: ltr;
+    }
+    @media (max-width: 720px) {
+      .compare { grid-template-columns: 1fr; }
+    }
+    .panel {
+      background: #0c0c0c;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+    }
+    .panel h2 {
+      margin: 0 0 4px;
+      font-size: 15px;
+    }
+    .panel p {
+      margin: 0 0 14px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    .bad .card { outline: 1px dashed #663; }
+    .callout {
+      margin-top: 10px;
+      font-size: 11px;
+      color: #c9a227;
+      direction: ltr;
+      text-align: left;
+    }
+    .anno {
+      margin-top: 28px;
+      direction: rtl;
+      text-align: right;
+      font-size: 13px;
+      color: #bbb;
+      line-height: 1.6;
+      background: #111;
+      border-radius: 14px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+    }
+  </style>
+</head>
+<body>
+  <h1>Awards cards — الشكل المطلوب</h1>
+  <p class="sub">
+    Explore → Awards · logo size ثابت · countdown صغير فوق يمين · التاريخ نص صغير تحت اللوقو فقط إذا محدد
+  </p>
+
+  <div class="rules">
+    <strong>Rules</strong>
+    <ul>
+      <li>حجم اللوقو <strong>ثابت</strong> (136×72) — مع أو بدون تاريخ</li>
+      <li>العدّ <code>in Nd</code> / <code>TBD</code> صغير في الزاوية، ما يغطي اللوقو</li>
+      <li>تاريخ الحفل تحت اللوقو كنص صغير (<code>14 Mar 2027</code>) — بدون بيل ضخم</li>
+      <li>إذا TBD: ما يظهر تاريخ تحت اللوقو</li>
+      <li>تحت الكارت: مدى السنوات فقط (<code>1929–2026</code>)</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Expected · Awards rail</div>
+  <div class="rail">
+    <!-- Oscars: has date -->
+    <div class="award">
+      <div class="card has-date">
+        <span class="countdown">in 183d</span>
+        <div class="logo">THE<br>OSCARS</div>
+        <div class="date">14 Mar 2027</div>
+      </div>
+      <div class="years">1929–2026</div>
+    </div>
+
+    <!-- Globes: has date -->
+    <div class="award">
+      <div class="card has-date">
+        <span class="countdown">in 120d</span>
+        <div class="logo" style="font-size:13px">GOLDEN<br>GLOBES</div>
+        <div class="date">10 Jan 2027</div>
+      </div>
+      <div class="years">1944–2026</div>
+    </div>
+
+    <!-- Emmys: soon -->
+    <div class="award">
+      <div class="card has-date">
+        <span class="countdown">in 2d</span>
+        <div class="logo emmys">EMMYS</div>
+        <div class="date">14 Sep 2026</div>
+      </div>
+      <div class="years">1970–2026</div>
+    </div>
+
+    <!-- BAFTA: TBD -->
+    <div class="award">
+      <div class="card no-date">
+        <span class="countdown">TBD</span>
+        <div class="logo bafta">EE BAFTA<br>FILM AWARDS</div>
+      </div>
+      <div class="years">1990–2025</div>
+    </div>
+
+    <!-- Cannes: TBD -->
+    <div class="award">
+      <div class="card no-date">
+        <span class="countdown">TBD</span>
+        <div class="logo cannes">❀</div>
+      </div>
+      <div class="years">1990–2025</div>
+    </div>
+  </div>
+
+  <div class="compare">
+    <div class="panel">
+      <h2>✅ With date (Oscars)</h2>
+      <p>نفس حجم اللوقو · تاريخ صغير تحت · countdown ما يدخل على اللوقو</p>
+      <div class="award" style="margin:0 auto">
+        <div class="card has-date">
+          <span class="countdown">in 183d</span>
+          <div class="logo">THE<br>OSCARS</div>
+          <div class="date">14 Mar 2027</div>
+        </div>
+        <div class="years">1929–2026</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>✅ TBD (BAFTA)</h2>
+      <p>نفس حجم اللوقو بالضبط · بدون سطر تاريخ تحت</p>
+      <div class="award" style="margin:0 auto">
+        <div class="card no-date">
+          <span class="countdown">TBD</span>
+          <div class="logo bafta">EE BAFTA<br>FILM AWARDS</div>
+        </div>
+        <div class="years">1990–2025</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="compare">
+    <div class="panel bad">
+      <h2>❌ Wrong (قبل الإصلاح)</h2>
+      <p>العدّ كبير يغطي اللوقو · اللوقو ينزاح · التاريخ بيل كبير / داخل الصورة</p>
+      <div class="award" style="margin:0 auto">
+        <div class="card has-date" style="min-height:100px">
+          <span class="countdown" style="font-size:11px;padding:4px 8px;top:6px;right:6px">in 183d</span>
+          <div class="logo" style="margin-left:28px;width:120px;height:64px;font-size:13px">THE<br>OSCARS</div>
+          <div class="date" style="font-size:10px;background:#222;color:#fff;padding:3px 8px;border-radius:999px;margin-top:2px">14 Mar 2027</div>
+        </div>
+        <div class="years">1929–2026</div>
+      </div>
+      <div class="callout">اللوقو مُزاح يمين + التيكست يدخل على الصورة</div>
+    </div>
+
+    <div class="panel">
+      <h2>✅ Correct (المطلوب)</h2>
+      <p>توسيط ثابت · نصوص صغيرة · التاريخ تحت اللوقو على الأبيض</p>
+      <div class="award" style="margin:0 auto">
+        <div class="card has-date">
+          <span class="countdown">in 183d</span>
+          <div class="logo">THE<br>OSCARS</div>
+          <div class="date">14 Mar 2027</div>
+        </div>
+        <div class="years">1929–2026</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="anno">
+    <strong>ملخص:</strong>
+    الكروت اللي لها موعد (Oscars / Globes / Emmys) تظهر تاريخ صغير تحت اللوقو.
+    الكروت بدون موعد (BAFTA / Cannes…) بس <code>TBD</code> فوق يمين، ونفس حجم اللوقو بدون سطر تاريخ.
+  </div>
+</body>
+</html>
