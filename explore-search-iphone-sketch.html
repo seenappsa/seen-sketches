@@ -264,9 +264,14 @@
   function render() {
     const text = q.value.trim().toLowerCase();
     const onLists = lists.style.display !== "none";
-    if (!text || onLists) {
+    if (onLists) {
+      results.style.display = "none";
+      return;
+    }
+    if (!text) {
       results.style.display = "none";
       results.innerHTML = "";
+      discover.style.display = "";
       return;
     }
     discover.style.display = "none";
