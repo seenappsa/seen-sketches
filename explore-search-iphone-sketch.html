@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Seen · بحث Explore على الآيفون</title>
+<style>
+  :root {
+    --primary: #7B2FBE;
+    --bg: #000;
+    --muted: #8e8e93;
+    --pill: rgba(120,120,128,0.28);
+    --line: rgba(255,255,255,0.14);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #111; color: #fff; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Arabic", sans-serif;
+    min-height: 100vh;
+  }
+  .wrap {
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+  }
+  .notes {
+    padding: 14px 16px 10px;
+    background: #141414;
+    border-bottom: 1px solid #222;
+  }
+  .notes h1 {
+    margin: 0 0 6px;
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .notes p {
+    margin: 0;
+    color: #9a9a9a;
+    font-size: 12px;
+    line-height: 1.55;
+  }
+  .notes b { color: #ddd; font-weight: 650; }
+  .screen {
+    position: relative;
+    flex: 1;
+    min-height: 640px;
+    background: #000;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .status {
+    height: 54px;
+    padding: 16px 22px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    font-size: 15px;
+    font-weight: 650;
+    direction: ltr;
+  }
+  .logo-row {
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .mark {
+    width: 0; height: 0;
+    border-style: solid;
+    border-width: 7px 0 7px 13px;
+    border-color: transparent transparent transparent #e10600;
+    filter: drop-shadow(0 0 0 #e10600);
+  }
+  .mark::after { content: ""; }
+  .bell {
+    position: absolute;
+    left: 18px;
+    top: 6px;
+    font-size: 16px;
+    color: #fff;
+  }
+  .dot {
+    position: absolute;
+    width: 8px; height: 8px;
+    background: #ff3b30;
+    border-radius: 50%;
+    left: 14px;
+    top: 4px;
+  }
+  .segs {
+    display: flex;
+    direction: ltr;
+    padding: 4px 28px 0;
+  }
+  .seg {
+    flex: 1;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 650;
+    color: #8e8e93;
+    padding-bottom: 8px;
+  }
+  .seg.on { color: #fff; box-shadow: inset 0 -2px 0 #fff; }
+  .feed {
+    flex: 1;
+    overflow: auto;
+    padding: 8px 0 120px;
+    direction: ltr;
+    -webkit-overflow-scrolling: touch;
+  }
+  .sec { padding: 10px 16px 4px; }
+  .sec h2 { margin: 0; font-size: 22px; font-weight: 760; letter-spacing: -0.3px; }
+  .meta { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .rowp {
+    display: flex;
+    gap: 10px;
+    overflow: hidden;
+    padding: 10px 16px 6px;
+  }
+  .card { width: 112px; flex: none; }
+  .poster {
+    height: 162px;
+    border-radius: 12px;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    padding: 8px;
+    font-size: 12px;
+    font-weight: 750;
+    line-height: 1.15;
+  }
+  .rank {
+    position: absolute;
+    left: 8px; bottom: 8px;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: #f5c518;
+    color: #000;
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+  }
+  .chips { display: flex; gap: 8px; padding: 8px 16px 0; }
+  .chip {
+    border: 0;
+    background: #2c2c2e;
+    color: #fff;
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-size: 14px;
+    font-weight: 650;
+  }
+  .chip.on { background: #fff; color: #000; }
+  .toast {
+    position: absolute;
+    left: 16px; right: 16px;
+    bottom: 128px;
+    background: rgba(40,40,42,0.94);
+    border-radius: 14px;
+    padding: 10px 12px;
+    font-size: 13px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: .2s ease;
+    pointer-events: none;
+    z-index: 5;
+  }
+  .toast.show { opacity: 1; transform: none; }
+
+  .dock {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: 8px 12px calc(10px + env(safe-area-inset-bottom));
+    background: linear-gradient(to top, rgba(0,0,0,.92), rgba(0,0,0,.55) 70%, transparent);
+    direction: ltr;
+    z-index: 4;
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 54px;
+  }
+  .back {
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    border: 0;
+    background: rgba(40,40,42,0.92);
+    color: #fff;
+    font-size: 18px;
+    flex: none;
+  }
+  .field {
+    flex: 1;
+    height: 46px;
+    border-radius: 23px;
+    border: 0;
+    background: rgba(60,60,64,0.92);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 8px 0 14px;
+    font-size: 16px;
+    text-align: left;
+  }
+  .field .ph { color: #b1b1b6; flex: 1; white-space: nowrap; overflow: hidden; }
+  .x {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 0;
+    background: rgba(255,255,255,0.18);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    display: none;
+    place-items: center;
+  }
+  .screen.kb .x { display: grid; }
+  .kb {
+    display: none;
+    margin-top: 8px;
+    background: #1c1c1e;
+    border-radius: 16px 16px 0 0;
+    padding: 8px 6px 8px;
+  }
+  .screen.kb .kb { display: block; }
+  .keys { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; direction: rtl; }
+  .keys span {
+    background: #4a4a4e;
+    border-radius: 6px;
+    text-align: center;
+    padding: 8px 0;
+    font-size: 14px;
+  }
+  .hint {
+    text-align: center;
+    color: #6e6e73;
+    font-size: 11px;
+    margin-top: 6px;
+    direction: rtl;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="notes">
+    <h1>الآيفون العادي · المطلوب</h1>
+    <p>
+      <b>أول فتح:</b> تبقى في Explore، بدون كيبورد، وبار البحث كامل بدون إكس.<br>
+      <b>تضغط البار:</b> يفتح الكيبورد ويظهر الإكس.<br>
+      <b>تضغط الإكس:</b> يقفل الكيبورد ويمد البار. ما يطلعك من Explore.<br>
+      <b>تنزل بالصفحة:</b> الكيبورد يقفل نفس الشيء.<br>
+      الرجوع للتبويب اللي قبل يكون من أيقونة البيت، مو من الإكس.
+    </p>
+  </div>
+
+  <div class="screen" id="screen">
+    <div class="status"><span>07:41</span><span>91</span></div>
+    <div class="logo-row">
+      <div class="mark"></div>
+      <div class="bell">🔔<span class="dot"></span></div>
+    </div>
+    <div class="segs">
+      <div class="seg on">Explore</div>
+      <div class="seg">Lists</div>
+    </div>
+    <div class="feed" id="feed">
+      <div class="sec">
+        <h2>Top 10</h2>
+        <div class="meta">Updated 27 Oct 2026</div>
+      </div>
+      <div class="chips"><button class="chip on">Shows</button><button class="chip">Movies</button></div>
+      <div class="rowp">
+        <div class="card"><div class="poster" style="background:linear-gradient(#3a2a28,#1a1010)">MOBLAND<span class="rank">1</span></div></div>
+        <div class="card"><div class="poster" style="background:linear-gradient(#5a3028,#24140f)">TULSA KING<span class="rank">2</span></div></div>
+        <div class="card"><div class="poster" style="background:linear-gradient(#6a5a48,#2a241c)">SLOW HORSES<span class="rank">3</span></div></div>
+      </div>
+      <div class="sec">
+        <h2>This Month</h2>
+        <div class="meta">November · 96 releases</div>
+      </div>
+      <div class="chips">
+        <button class="chip on">All</button>
+        <button class="chip">Library</button>
+        <button class="chip">Shows</button>
+        <button class="chip">Movies</button>
+      </div>
+      <div class="rowp">
+        <div class="card"><div class="poster" style="background:linear-gradient(#2030a0,#101848)">WER WEISS</div></div>
+        <div class="card"><div class="poster" style="background:linear-gradient(#c45a1a,#3a1c0c)">BASS X</div></div>
+        <div class="card"><div class="poster" style="background:linear-gradient(#1a4a8a,#061428)">GODZILLA</div></div>
+      </div>
+      <div class="sec">
+        <h2>Trending Now</h2>
+        <div class="meta">Hot this week</div>
+      </div>
+      <div class="rowp">
+        <div class="card"><div class="poster" style="background:linear-gradient(#123,#012)">PINOY</div></div>
+        <div class="card"><div class="poster" style="background:#f4f4f4;color:#111">STARDOM</div></div>
+        <div class="card"><div class="poster" style="background:linear-gradient(#064,#021)">POLIZEIRUF</div></div>
+      </div>
+      <div style="height:80px"></div>
+    </div>
+
+    <div class="toast" id="toast">بقيت في Explore</div>
+
+    <div class="dock">
+      <div class="bar">
+        <button class="back" type="button" title="الصفحة السابقة">⌂</button>
+        <button class="field" id="field" type="button">
+          <span>⌕</span>
+          <span class="ph">Search shows, movies, people...</span>
+          <span class="x" id="x">×</span>
+        </button>
+      </div>
+      <div class="kb" aria-hidden="true">
+        <div class="keys">
+          <span>ض</span><span>ص</span><span>ث</span><span>ق</span><span>ف</span><span>غ</span><span>ع</span><span>ه</span><span>خ</span><span>ح</span>
+          <span>ش</span><span>س</span><span>ي</span><span>ب</span><span>ل</span><span>ا</span><span>ت</span><span>ن</span><span>م</span><span>ك</span>
+        </div>
+        <div class="hint">الكيبورد مفتوح · الإكس يقفله فقط</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  const screen = document.getElementById("screen");
+  const field = document.getElementById("field");
+  const x = document.getElementById("x");
+  const feed = document.getElementById("feed");
+  const toast = document.getElementById("toast");
+  let toastTimer;
+
+  function openKb() {
+    screen.classList.add("kb");
+  }
+  function closeKb(message) {
+    const was = screen.classList.contains("kb");
+    screen.classList.remove("kb");
+    if (was && message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 1400);
+    }
+  }
+
+  field.addEventListener("click", (e) => {
+    if (e.target === x) return;
+    openKb();
+  });
+  x.addEventListener("click", (e) => {
+    e.stopPropagation();
+    closeKb("بقيت في Explore · البار تمدّد");
+  });
+  feed.addEventListener("scroll", () => {
+    if (feed.scrollTop > 8) closeKb("النزول قفل الكيبورد");
+  });
+</script>
+</body>
+</html>
